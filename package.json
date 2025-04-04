@@ -1,0 +1,19 @@
+{
+  "name": "bible-epub-converter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "epub": "^1.3.0",
+    "fs-extra": "^11.3.0",
+    "path": "^0.12.7"
+  }
+}
