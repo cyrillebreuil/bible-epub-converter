@@ -1,0 +1,1371 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="fra">
+  <head>
+    <meta content="f35611dd-cea4-47b7-93d4-6269da532d3f" name="dtb:uid"/>
+    <meta content="5" name="dtb:depth"/>
+    <meta content="calibre (4.10.1)" name="dtb:generator"/>
+    <meta content="0" name="dtb:totalPageCount"/>
+    <meta content="0" name="dtb:maxPageNumber"/>
+  </head>
+  <docTitle>
+    <text>La Bible – traduction officielle liturgique (Bible officielle) (French Edition)</text>
+  </docTitle>
+  <navMap>
+    <navPoint class="chapter" id="num_1" playOrder="1">
+      <navLabel>
+        <text>Titre</text>
+      </navLabel>
+      <content src="text/part0000.html"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_2" playOrder="2">
+      <navLabel>
+        <text>Recherche</text>
+      </navLabel>
+      <content src="text/part0001.html"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_3" playOrder="3">
+      <navLabel>
+        <text>Introduction générale</text>
+      </navLabel>
+      <content src="text/part0002_split_000.html"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_4" playOrder="4">
+      <navLabel>
+        <text>Abréviations</text>
+      </navLabel>
+      <content src="text/part0002_split_025.html#table_abreviations_bibliques"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_5" playOrder="5">
+      <navLabel>
+        <text>ANCIEN TESTAMENT</text>
+      </navLabel>
+      <content src="text/part0004.html"/>
+      <navPoint class="chapter" id="num_6" playOrder="6">
+        <navLabel>
+          <text>INTRODUCTION</text>
+        </navLabel>
+        <content src="text/part0005_split_000.html"/>
+      </navPoint>
+      <navPoint class="chapter" id="num_7" playOrder="7">
+        <navLabel>
+          <text>PENTATEUQUE</text>
+        </navLabel>
+        <content src="text/part0006.html"/>
+        <navPoint class="chapter" id="num_8" playOrder="8">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0007_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_9" playOrder="9">
+          <navLabel>
+            <text>Genèse</text>
+          </navLabel>
+          <content src="text/part0008_split_000.html"/>
+          <navPoint class="chapter" id="num_10" playOrder="10">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0009_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_11" playOrder="11">
+            <navLabel>
+              <text>Livre de la Genèse</text>
+            </navLabel>
+            <content src="text/part0010_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_12" playOrder="12">
+          <navLabel>
+            <text>Exode</text>
+          </navLabel>
+          <content src="text/part0015_split_000.html"/>
+          <navPoint class="chapter" id="num_13" playOrder="13">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0016_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_14" playOrder="14">
+            <navLabel>
+              <text>Livre de l’Exode</text>
+            </navLabel>
+            <content src="text/part0017_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_15" playOrder="15">
+          <navLabel>
+            <text>Lévites ou Lévitique</text>
+          </navLabel>
+          <content src="text/part0021_split_000.html"/>
+          <navPoint class="chapter" id="num_16" playOrder="16">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0022_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_17" playOrder="17">
+            <navLabel>
+              <text>Livre des Lévites</text>
+            </navLabel>
+            <content src="text/part0023_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_18" playOrder="18">
+          <navLabel>
+            <text>Nombres</text>
+          </navLabel>
+          <content src="text/part0025_split_000.html"/>
+          <navPoint class="chapter" id="num_19" playOrder="19">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0026_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_20" playOrder="20">
+            <navLabel>
+              <text>Livre des Nombres</text>
+            </navLabel>
+            <content src="text/part0027_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_21" playOrder="21">
+          <navLabel>
+            <text>Deutéronome</text>
+          </navLabel>
+          <content src="text/part0031_split_000.html"/>
+          <navPoint class="chapter" id="num_22" playOrder="22">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0032_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_23" playOrder="23">
+            <navLabel>
+              <text>Livre du Deutéronome</text>
+            </navLabel>
+            <content src="text/part0033_split_000.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_24" playOrder="24">
+        <navLabel>
+          <text>LIVRES HISTORIQUES</text>
+        </navLabel>
+        <content src="text/part0035.html"/>
+        <navPoint class="chapter" id="num_25" playOrder="25">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0036_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_26" playOrder="26">
+          <navLabel>
+            <text>Josué</text>
+          </navLabel>
+          <content src="text/part0038_split_000.html"/>
+          <navPoint class="chapter" id="num_27" playOrder="27">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0039.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_28" playOrder="28">
+            <navLabel>
+              <text>Livre de Josué</text>
+            </navLabel>
+            <content src="text/part0040_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_29" playOrder="29">
+          <navLabel>
+            <text>Juges</text>
+          </navLabel>
+          <content src="text/part0042_split_000.html"/>
+          <navPoint class="chapter" id="num_30" playOrder="30">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0043.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_31" playOrder="31">
+            <navLabel>
+              <text>Livre des Juges</text>
+            </navLabel>
+            <content src="text/part0044_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_32" playOrder="32">
+          <navLabel>
+            <text>Ruth</text>
+          </navLabel>
+          <content src="text/part0046_split_000.html"/>
+          <navPoint class="chapter" id="num_33" playOrder="33">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0047.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_34" playOrder="34">
+            <navLabel>
+              <text>Livre de Ruth</text>
+            </navLabel>
+            <content src="text/part0049.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_35" playOrder="35">
+          <navLabel>
+            <text>Samuel</text>
+          </navLabel>
+          <content src="text/part0051_split_000.html"/>
+          <navPoint class="chapter" id="num_36" playOrder="36">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0052_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_37" playOrder="37">
+            <navLabel>
+              <text>Premier Livre de Samuel</text>
+            </navLabel>
+            <content src="text/part0054_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_38" playOrder="38">
+            <navLabel>
+              <text>Deuxième Livre de Samuel</text>
+            </navLabel>
+            <content src="text/part0056_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_39" playOrder="39">
+          <navLabel>
+            <text>Rois</text>
+          </navLabel>
+          <content src="text/part0058_split_000.html"/>
+          <navPoint class="chapter" id="num_40" playOrder="40">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0059_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_41" playOrder="41">
+            <navLabel>
+              <text>Premier livre des Rois</text>
+            </navLabel>
+            <content src="text/part0060_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_42" playOrder="42">
+            <navLabel>
+              <text>Deuxième livre des Rois</text>
+            </navLabel>
+            <content src="text/part0062_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_43" playOrder="43">
+          <navLabel>
+            <text>Chroniques</text>
+          </navLabel>
+          <content src="text/part0064_split_000.html"/>
+          <navPoint class="chapter" id="num_44" playOrder="44">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0065_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_45" playOrder="45">
+            <navLabel>
+              <text>Premier Livre des Chroniques</text>
+            </navLabel>
+            <content src="text/part0066_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_46" playOrder="46">
+            <navLabel>
+              <text>Deuxième Livre des Chroniques</text>
+            </navLabel>
+            <content src="text/part0068_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_47" playOrder="47">
+          <navLabel>
+            <text>Esdras</text>
+          </navLabel>
+          <content src="text/part0070_split_000.html"/>
+          <navPoint class="chapter" id="num_48" playOrder="48">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0071.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_49" playOrder="49">
+            <navLabel>
+              <text>Livre d’Esdras</text>
+            </navLabel>
+            <content src="text/part0072_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_50" playOrder="50">
+          <navLabel>
+            <text>Néhémie</text>
+          </navLabel>
+          <content src="text/part0074_split_000.html"/>
+          <navPoint class="chapter" id="num_51" playOrder="51">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0075.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_52" playOrder="52">
+            <navLabel>
+              <text>Livre de Néhémie</text>
+            </navLabel>
+            <content src="text/part0076_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_53" playOrder="53">
+          <navLabel>
+            <text>Tobie</text>
+          </navLabel>
+          <content src="text/part0078_split_000.html"/>
+          <navPoint class="chapter" id="num_54" playOrder="54">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0079.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_55" playOrder="55">
+            <navLabel>
+              <text>Livre de Tobie</text>
+            </navLabel>
+            <content src="text/part0081.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_56" playOrder="56">
+          <navLabel>
+            <text>Judith</text>
+          </navLabel>
+          <content src="text/part0083_split_000.html"/>
+          <navPoint class="chapter" id="num_57" playOrder="57">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0084_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_58" playOrder="58">
+            <navLabel>
+              <text>Livre de Judith</text>
+            </navLabel>
+            <content src="text/part0085_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_59" playOrder="59">
+          <navLabel>
+            <text>Esther</text>
+          </navLabel>
+          <content src="text/part0087_split_000.html"/>
+          <navPoint class="chapter" id="num_60" playOrder="60">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0088.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_61" playOrder="61">
+            <navLabel>
+              <text>Livre d’Esther</text>
+            </navLabel>
+            <content src="text/part0090_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_62" playOrder="62">
+          <navLabel>
+            <text>Martyrs d’Israël ou Maccabées</text>
+          </navLabel>
+          <content src="text/part0092_split_000.html"/>
+          <navPoint class="chapter" id="num_63" playOrder="63">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0093_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_64" playOrder="64">
+            <navLabel>
+              <text>Premier livre des Martyrs d’Israël</text>
+            </navLabel>
+            <content src="text/part0094_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_65" playOrder="65">
+            <navLabel>
+              <text>Deuxième livre des Martyrs d’Israël</text>
+            </navLabel>
+            <content src="text/part0096_split_000.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_66" playOrder="66">
+        <navLabel>
+          <text>LIVRES POÉTIQUES ET SAPIENTIAUX</text>
+        </navLabel>
+        <content src="text/part0098.html"/>
+        <navPoint class="chapter" id="num_67" playOrder="67">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0099.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_68" playOrder="68">
+          <navLabel>
+            <text>Job</text>
+          </navLabel>
+          <content src="text/part0100_split_000.html"/>
+          <navPoint class="chapter" id="num_69" playOrder="69">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0101.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_70" playOrder="70">
+            <navLabel>
+              <text>Livre de Job</text>
+            </navLabel>
+            <content src="text/part0102_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_71" playOrder="71">
+          <navLabel>
+            <text>Psaumes</text>
+          </navLabel>
+          <content src="text/part0104_split_000.html"/>
+          <navPoint class="chapter" id="num_72" playOrder="72">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0105_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_73" playOrder="73">
+            <navLabel>
+              <text>Livre des Psaumes</text>
+            </navLabel>
+            <content src="text/part0107.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_74" playOrder="74">
+          <navLabel>
+            <text>Proverbes</text>
+          </navLabel>
+          <content src="text/part0117_split_000.html"/>
+          <navPoint class="chapter" id="num_75" playOrder="75">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0118.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_76" playOrder="76">
+            <navLabel>
+              <text>Livre des Proverbes</text>
+            </navLabel>
+            <content src="text/part0119_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_77" playOrder="77">
+          <navLabel>
+            <text>Qohèleth ou Ecclésiaste</text>
+          </navLabel>
+          <content src="text/part0121_split_000.html"/>
+          <navPoint class="chapter" id="num_78" playOrder="78">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0122.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_79" playOrder="79">
+            <navLabel>
+              <text>Livre de Qohèleth</text>
+            </navLabel>
+            <content src="text/part0123.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_80" playOrder="80">
+          <navLabel>
+            <text>Cantique des Cantiques</text>
+          </navLabel>
+          <content src="text/part0125_split_000.html"/>
+          <navPoint class="chapter" id="num_81" playOrder="81">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0126.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_82" playOrder="82">
+            <navLabel>
+              <text>Cantique des Cantiques</text>
+            </navLabel>
+            <content src="text/part0127.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_83" playOrder="83">
+          <navLabel>
+            <text>Sagesse ou Sagesse de Salomon</text>
+          </navLabel>
+          <content src="text/part0129_split_000.html"/>
+          <navPoint class="chapter" id="num_84" playOrder="84">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0130.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_85" playOrder="85">
+            <navLabel>
+              <text>Livre de la Sagesse</text>
+            </navLabel>
+            <content src="text/part0131_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_86" playOrder="86">
+          <navLabel>
+            <text>Ben Sira ou Ecclésiastique</text>
+          </navLabel>
+          <content src="text/part0133_split_000.html"/>
+          <navPoint class="chapter" id="num_87" playOrder="87">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0134.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_88" playOrder="88">
+            <navLabel>
+              <text>Livre de Ben Sira</text>
+            </navLabel>
+            <content src="text/part0136_split_000.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_89" playOrder="89">
+        <navLabel>
+          <text>LIVRES PROPHÉTIQUES</text>
+        </navLabel>
+        <content src="text/part0144.html"/>
+        <navPoint class="chapter" id="num_90" playOrder="90">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0145_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_91" playOrder="91">
+          <navLabel>
+            <text>Isaïe</text>
+          </navLabel>
+          <content src="text/part0146_split_000.html"/>
+          <navPoint class="chapter" id="num_92" playOrder="92">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0147_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_93" playOrder="93">
+            <navLabel>
+              <text>Livre d’Isaïe</text>
+            </navLabel>
+            <content src="text/part0148_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_94" playOrder="94">
+          <navLabel>
+            <text>Jérémie</text>
+          </navLabel>
+          <content src="text/part0154_split_000.html"/>
+          <navPoint class="chapter" id="num_95" playOrder="95">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0155.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_96" playOrder="96">
+            <navLabel>
+              <text>Livre de Jérémie</text>
+            </navLabel>
+            <content src="text/part0156_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_97" playOrder="97">
+          <navLabel>
+            <text>Lamentations</text>
+          </navLabel>
+          <content src="text/part0161_split_000.html"/>
+          <navPoint class="chapter" id="num_98" playOrder="98">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0162.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_99" playOrder="99">
+            <navLabel>
+              <text>Livre des Lamentations</text>
+            </navLabel>
+            <content src="text/part0163_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_100" playOrder="100">
+          <navLabel>
+            <text>Baruc et Lettre de Jérémie</text>
+          </navLabel>
+          <content src="text/part0165_split_000.html"/>
+          <navPoint class="chapter" id="num_101" playOrder="101">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0166_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_102" playOrder="102">
+            <navLabel>
+              <text>Livre de Baruc</text>
+            </navLabel>
+            <content src="text/part0167_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_103" playOrder="103">
+            <navLabel>
+              <text>Lettre de Jérémie</text>
+            </navLabel>
+            <content src="text/part0169.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_104" playOrder="104">
+          <navLabel>
+            <text>Ézékiel</text>
+          </navLabel>
+          <content src="text/part0171_split_000.html"/>
+          <navPoint class="chapter" id="num_105" playOrder="105">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0172.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_106" playOrder="106">
+            <navLabel>
+              <text>Livre d’Ézékiel</text>
+            </navLabel>
+            <content src="text/part0173_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_107" playOrder="107">
+          <navLabel>
+            <text>Daniel</text>
+          </navLabel>
+          <content src="text/part0179_split_000.html"/>
+          <navPoint class="chapter" id="num_108" playOrder="108">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0180.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_109" playOrder="109">
+            <navLabel>
+              <text>Livre de Daniel</text>
+            </navLabel>
+            <content src="text/part0181_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_110" playOrder="110">
+          <navLabel>
+            <text>Osée</text>
+          </navLabel>
+          <content src="text/part0183_split_000.html"/>
+          <navPoint class="chapter" id="num_111" playOrder="111">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0184_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_112" playOrder="112">
+            <navLabel>
+              <text>Livre d’Osée</text>
+            </navLabel>
+            <content src="text/part0185_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_113" playOrder="113">
+          <navLabel>
+            <text>Joël</text>
+          </navLabel>
+          <content src="text/part0187_split_000.html"/>
+          <navPoint class="chapter" id="num_114" playOrder="114">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0188_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_115" playOrder="115">
+            <navLabel>
+              <text>Livre de Joël</text>
+            </navLabel>
+            <content src="text/part0189.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_116" playOrder="116">
+          <navLabel>
+            <text>Amos</text>
+          </navLabel>
+          <content src="text/part0191_split_000.html"/>
+          <navPoint class="chapter" id="num_117" playOrder="117">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0192_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_118" playOrder="118">
+            <navLabel>
+              <text>Livre d’Amos</text>
+            </navLabel>
+            <content src="text/part0193_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_119" playOrder="119">
+          <navLabel>
+            <text>Abdias</text>
+          </navLabel>
+          <content src="text/part0195_split_000.html"/>
+          <navPoint class="chapter" id="num_120" playOrder="120">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0196.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_121" playOrder="121">
+            <navLabel>
+              <text>Livre d’Abdias</text>
+            </navLabel>
+            <content src="text/part0197.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_122" playOrder="122">
+          <navLabel>
+            <text>Jonas</text>
+          </navLabel>
+          <content src="text/part0199_split_000.html"/>
+          <navPoint class="chapter" id="num_123" playOrder="123">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0200.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_124" playOrder="124">
+            <navLabel>
+              <text>Livre de Jonas</text>
+            </navLabel>
+            <content src="text/part0201.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_125" playOrder="125">
+          <navLabel>
+            <text>Michée</text>
+          </navLabel>
+          <content src="text/part0203_split_000.html"/>
+          <navPoint class="chapter" id="num_126" playOrder="126">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0204_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_127" playOrder="127">
+            <navLabel>
+              <text>Livre de Michée</text>
+            </navLabel>
+            <content src="text/part0205_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_128" playOrder="128">
+          <navLabel>
+            <text>Nahoum</text>
+          </navLabel>
+          <content src="text/part0207_split_000.html"/>
+          <navPoint class="chapter" id="num_129" playOrder="129">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0208.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_130" playOrder="130">
+            <navLabel>
+              <text>Livre de Nahoum</text>
+            </navLabel>
+            <content src="text/part0209.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_131" playOrder="131">
+          <navLabel>
+            <text>Habacuc</text>
+          </navLabel>
+          <content src="text/part0211_split_000.html"/>
+          <navPoint class="chapter" id="num_132" playOrder="132">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0212.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_133" playOrder="133">
+            <navLabel>
+              <text>Livre d’Habacuc</text>
+            </navLabel>
+            <content src="text/part0213.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_134" playOrder="134">
+          <navLabel>
+            <text>Sophonie</text>
+          </navLabel>
+          <content src="text/part0215_split_000.html"/>
+          <navPoint class="chapter" id="num_135" playOrder="135">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0216.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_136" playOrder="136">
+            <navLabel>
+              <text>Livre de Sophonie</text>
+            </navLabel>
+            <content src="text/part0217.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_137" playOrder="137">
+          <navLabel>
+            <text>Aggée</text>
+          </navLabel>
+          <content src="text/part0219_split_000.html"/>
+          <navPoint class="chapter" id="num_138" playOrder="138">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0220.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_139" playOrder="139">
+            <navLabel>
+              <text>Livre d’Aggée</text>
+            </navLabel>
+            <content src="text/part0221.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_140" playOrder="140">
+          <navLabel>
+            <text>Zacharie</text>
+          </navLabel>
+          <content src="text/part0223_split_000.html"/>
+          <navPoint class="chapter" id="num_141" playOrder="141">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0224_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_142" playOrder="142">
+            <navLabel>
+              <text>Livre de Zacharie</text>
+            </navLabel>
+            <content src="text/part0225_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_143" playOrder="143">
+          <navLabel>
+            <text>Malachie</text>
+          </navLabel>
+          <content src="text/part0227_split_000.html"/>
+          <navPoint class="chapter" id="num_144" playOrder="144">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0228.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_145" playOrder="145">
+            <navLabel>
+              <text>Livre de Malachie</text>
+            </navLabel>
+            <content src="text/part0229.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="num_146" playOrder="146">
+      <navLabel>
+        <text>NOUVEAU TESTAMENT</text>
+      </navLabel>
+      <content src="text/part0231.html"/>
+      <navPoint class="chapter" id="num_147" playOrder="147">
+        <navLabel>
+          <text>INTRODUCTION</text>
+        </navLabel>
+        <content src="text/part0232_split_000.html"/>
+      </navPoint>
+      <navPoint class="chapter" id="num_148" playOrder="148">
+        <navLabel>
+          <text>ÉVANGILES</text>
+        </navLabel>
+        <content src="text/part0234.html"/>
+        <navPoint class="chapter" id="num_149" playOrder="149">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0235_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_150" playOrder="150">
+          <navLabel>
+            <text>Matthieu</text>
+          </navLabel>
+          <content src="text/part0238_split_000.html"/>
+          <navPoint class="chapter" id="num_151" playOrder="151">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0239_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_152" playOrder="152">
+            <navLabel>
+              <text>Évangile selon Saint Matthieu</text>
+            </navLabel>
+            <content src="text/part0240_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_153" playOrder="153">
+          <navLabel>
+            <text>Marc</text>
+          </navLabel>
+          <content src="text/part0242_split_000.html"/>
+          <navPoint class="chapter" id="num_154" playOrder="154">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0243_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_155" playOrder="155">
+            <navLabel>
+              <text>Évangile selon Saint Marc</text>
+            </navLabel>
+            <content src="text/part0245_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_156" playOrder="156">
+          <navLabel>
+            <text>Luc</text>
+          </navLabel>
+          <content src="text/part0247_split_000.html"/>
+          <navPoint class="chapter" id="num_157" playOrder="157">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0248_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_158" playOrder="158">
+            <navLabel>
+              <text>Évangile selon Saint Luc</text>
+            </navLabel>
+            <content src="text/part0249_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_159" playOrder="159">
+          <navLabel>
+            <text>Jean</text>
+          </navLabel>
+          <content src="text/part0255_split_000.html"/>
+          <navPoint class="chapter" id="num_160" playOrder="160">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0256_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_161" playOrder="161">
+            <navLabel>
+              <text>Évangile selon Saint Jean</text>
+            </navLabel>
+            <content src="text/part0257_split_000.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_162" playOrder="162">
+        <navLabel>
+          <text>ACTES DES APÔTRES</text>
+        </navLabel>
+        <content src="text/part0259_split_000.html"/>
+        <navPoint class="chapter" id="num_163" playOrder="163">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0260_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_164" playOrder="164">
+          <navLabel>
+            <text>Actes des Apôtres</text>
+          </navLabel>
+          <content src="text/part0261_split_000.html"/>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_165" playOrder="165">
+        <navLabel>
+          <text>LETTRES PAULINIENNES</text>
+        </navLabel>
+        <content src="text/part0263.html"/>
+        <navPoint class="chapter" id="num_166" playOrder="166">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0264.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_167" playOrder="167">
+          <navLabel>
+            <text>Romains</text>
+          </navLabel>
+          <content src="text/part0265_split_000.html"/>
+          <navPoint class="chapter" id="num_168" playOrder="168">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0266.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_169" playOrder="169">
+            <navLabel>
+              <text>Lettre aux Romains</text>
+            </navLabel>
+            <content src="text/part0267_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_170" playOrder="170">
+          <navLabel>
+            <text>Corinthiens</text>
+          </navLabel>
+          <content src="text/part0269_split_000.html"/>
+          <navPoint class="chapter" id="num_171" playOrder="171">
+            <navLabel>
+              <text>Introduction à la Première lettre aux Corinthiens</text>
+            </navLabel>
+            <content src="text/part0270.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_172" playOrder="172">
+            <navLabel>
+              <text>Première lettre aux Corinthiens</text>
+            </navLabel>
+            <content src="text/part0271_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_173" playOrder="173">
+            <navLabel>
+              <text>Introduction à la Deuxième lettre aux Corinthiens</text>
+            </navLabel>
+            <content src="text/part0273.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_174" playOrder="174">
+            <navLabel>
+              <text>Deuxième lettre aux Corinthiens</text>
+            </navLabel>
+            <content src="text/part0274_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_175" playOrder="175">
+          <navLabel>
+            <text>Galates</text>
+          </navLabel>
+          <content src="text/part0276_split_000.html"/>
+          <navPoint class="chapter" id="num_176" playOrder="176">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0277_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_177" playOrder="177">
+            <navLabel>
+              <text>Lettre aux Galates</text>
+            </navLabel>
+            <content src="text/part0278_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_178" playOrder="178">
+          <navLabel>
+            <text>Éphésiens</text>
+          </navLabel>
+          <content src="text/part0280_split_000.html"/>
+          <navPoint class="chapter" id="num_179" playOrder="179">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0281.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_180" playOrder="180">
+            <navLabel>
+              <text>Lettre aux Éphésiens</text>
+            </navLabel>
+            <content src="text/part0282_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_181" playOrder="181">
+          <navLabel>
+            <text>Philippiens</text>
+          </navLabel>
+          <content src="text/part0284_split_000.html"/>
+          <navPoint class="chapter" id="num_182" playOrder="182">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0285.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_183" playOrder="183">
+            <navLabel>
+              <text>Lettre aux Philippiens</text>
+            </navLabel>
+            <content src="text/part0286_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_184" playOrder="184">
+          <navLabel>
+            <text>Colossiens</text>
+          </navLabel>
+          <content src="text/part0288_split_000.html"/>
+          <navPoint class="chapter" id="num_185" playOrder="185">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0289.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_186" playOrder="186">
+            <navLabel>
+              <text>Lettre aux Colossiens</text>
+            </navLabel>
+            <content src="text/part0290_split_000.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_187" playOrder="187">
+          <navLabel>
+            <text>Thessaloniciens</text>
+          </navLabel>
+          <content src="text/part0292_split_000.html"/>
+          <navPoint class="chapter" id="num_188" playOrder="188">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0293_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_189" playOrder="189">
+            <navLabel>
+              <text>Première lettre aux Thessaloniciens</text>
+            </navLabel>
+            <content src="text/part0294.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_190" playOrder="190">
+            <navLabel>
+              <text>Deuxième lettre aux Thessaloniciens</text>
+            </navLabel>
+            <content src="text/part0296.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_191" playOrder="191">
+          <navLabel>
+            <text>Timothée</text>
+          </navLabel>
+          <content src="text/part0298_split_000.html"/>
+          <navPoint class="chapter" id="num_192" playOrder="192">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0299.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_193" playOrder="193">
+            <navLabel>
+              <text>Première lettre à Timothée</text>
+            </navLabel>
+            <content src="text/part0300.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_194" playOrder="194">
+            <navLabel>
+              <text>Deuxième lettre à Timothée</text>
+            </navLabel>
+            <content src="text/part0302.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_195" playOrder="195">
+          <navLabel>
+            <text>Tite</text>
+          </navLabel>
+          <content src="text/part0304_split_000.html"/>
+          <navPoint class="chapter" id="num_196" playOrder="196">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0305.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_197" playOrder="197">
+            <navLabel>
+              <text>Lettre à Tite</text>
+            </navLabel>
+            <content src="text/part0306.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_198" playOrder="198">
+          <navLabel>
+            <text>Philémon</text>
+          </navLabel>
+          <content src="text/part0308_split_000.html"/>
+          <navPoint class="chapter" id="num_199" playOrder="199">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0309.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_200" playOrder="200">
+            <navLabel>
+              <text>Lettre à Philémon</text>
+            </navLabel>
+            <content src="text/part0310.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_201" playOrder="201">
+          <navLabel>
+            <text>Hébreux</text>
+          </navLabel>
+          <content src="text/part0312_split_000.html"/>
+          <navPoint class="chapter" id="num_202" playOrder="202">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0313_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_203" playOrder="203">
+            <navLabel>
+              <text>Lettre aux Hébreux</text>
+            </navLabel>
+            <content src="text/part0314_split_000.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_204" playOrder="204">
+        <navLabel>
+          <text>LETTRES CATHOLIQUES</text>
+        </navLabel>
+        <content src="text/part0316.html"/>
+        <navPoint class="chapter" id="num_205" playOrder="205">
+          <navLabel>
+            <text>Jacques</text>
+          </navLabel>
+          <content src="text/part0317_split_000.html"/>
+          <navPoint class="chapter" id="num_206" playOrder="206">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0318_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_207" playOrder="207">
+            <navLabel>
+              <text>Lettre de saint Jacques</text>
+            </navLabel>
+            <content src="text/part0319.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_208" playOrder="208">
+          <navLabel>
+            <text>Pierre</text>
+          </navLabel>
+          <content src="text/part0321_split_000.html"/>
+          <navPoint class="chapter" id="num_209" playOrder="209">
+            <navLabel>
+              <text>Introduction à la Première lettre de saint Pierre</text>
+            </navLabel>
+            <content src="text/part0322_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_210" playOrder="210">
+            <navLabel>
+              <text>Première lettre de saint Pierre</text>
+            </navLabel>
+            <content src="text/part0323_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_211" playOrder="211">
+            <navLabel>
+              <text>Introduction à la Deuxième Lettre de saint Pierre</text>
+            </navLabel>
+            <content src="text/part0325_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_212" playOrder="212">
+            <navLabel>
+              <text>Deuxième lettre de Saint Pierre</text>
+            </navLabel>
+            <content src="text/part0326.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_213" playOrder="213">
+          <navLabel>
+            <text>Jean</text>
+          </navLabel>
+          <content src="text/part0328_split_000.html"/>
+          <navPoint class="chapter" id="num_214" playOrder="214">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0329_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_215" playOrder="215">
+            <navLabel>
+              <text>Première lettre de saint Jean</text>
+            </navLabel>
+            <content src="text/part0330_split_000.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_216" playOrder="216">
+            <navLabel>
+              <text>Deuxième lettre de saint Jean</text>
+            </navLabel>
+            <content src="text/part0332.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_217" playOrder="217">
+            <navLabel>
+              <text>Troisième lettre de saint Jean</text>
+            </navLabel>
+            <content src="text/part0334.html"/>
+          </navPoint>
+        </navPoint>
+        <navPoint class="chapter" id="num_218" playOrder="218">
+          <navLabel>
+            <text>Jude</text>
+          </navLabel>
+          <content src="text/part0336_split_000.html"/>
+          <navPoint class="chapter" id="num_219" playOrder="219">
+            <navLabel>
+              <text>Introduction</text>
+            </navLabel>
+            <content src="text/part0337.html"/>
+          </navPoint>
+          <navPoint class="chapter" id="num_220" playOrder="220">
+            <navLabel>
+              <text>Lettre de saint Jude</text>
+            </navLabel>
+            <content src="text/part0338.html"/>
+          </navPoint>
+        </navPoint>
+      </navPoint>
+      <navPoint class="chapter" id="num_221" playOrder="221">
+        <navLabel>
+          <text>APOCALYPSE</text>
+        </navLabel>
+        <content src="text/part0340_split_000.html"/>
+        <navPoint class="chapter" id="num_222" playOrder="222">
+          <navLabel>
+            <text>Introduction</text>
+          </navLabel>
+          <content src="text/part0341_split_000.html"/>
+        </navPoint>
+        <navPoint class="chapter" id="num_223" playOrder="223">
+          <navLabel>
+            <text>Livre de l’Apocalypse</text>
+          </navLabel>
+          <content src="text/part0342_split_000.html"/>
+        </navPoint>
+      </navPoint>
+    </navPoint>
+    <navPoint class="chapter" id="num_224" playOrder="224">
+      <navLabel>
+        <text>Cartes</text>
+      </navLabel>
+      <content src="text/part0344_split_000.html"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_225" playOrder="225">
+      <navLabel>
+        <text>Tables</text>
+      </navLabel>
+      <content src="text/part0345.html"/>
+    </navPoint>
+    <navPoint class="chapter" id="num_226" playOrder="226">
+      <navLabel>
+        <text>Copyright et recognitio</text>
+      </navLabel>
+      <content src="text/part0366.html"/>
+    </navPoint>
+  </navMap>
+</ncx>

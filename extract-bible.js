@@ -52,6 +52,37 @@ class BibleConverter {
 		this.bookMappings = this.initializeBookMappings();
 		this.currentBook = null;
 	}
+	// Méthode pour séparer les versets fusionnés
+	separateVerses(text) {
+		// Rechercher des motifs comme "21Hénok vécut..." où un numéro est directement suivi de texte
+		const versePattern =
+			/(\d+)([A-ZÉÈÊÀÂÇÙÛÔÏ].*?)(?=\s+\d+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)/g;
+		const verses = [];
+		let match;
+
+		// Vérifier si le texte contient des numéros de versets intégrés
+		const containsEmbeddedVerses = /\s\d+[A-ZÉÈÊÀÂÇÙÛÔÏ]/.test(text);
+
+		if (containsEmbeddedVerses) {
+			console.log(
+				"  Détection de versets fusionnés, séparation en cours...",
+			);
+
+			// Réinitialiser le regex pour commencer depuis le début
+			versePattern.lastIndex = 0;
+
+			while ((match = versePattern.exec(text)) !== null) {
+				const verseNum = parseInt(match[1], 10);
+				const verseText = match[2].trim();
+				verses.push({ verseNum, verseText });
+				console.log(
+					`    Verset séparé ${verseNum}: "${verseText.substring(0, 30)}..."`,
+				);
+			}
+		}
+
+		return verses.length > 0 ? verses : null;
+	}
 
 	// Correspondances des noms de livres
 	initializeBookMappings() {
@@ -928,13 +959,32 @@ ON CONFLICT ("bookID", "translationID") DO NOTHING;
 	}
 
 	// Ajoute un verset à la base de données
+	// Ajoute un verset à la base de données
 	addVerse(bookId, chapterNum, verseNum, text) {
 		const { code } = this.config.translationInfo;
 
-		// Échapper les apostrophes et autres caractères problématiques
-		const escapedText = text.replace(/'/g, "''");
+		// Vérifier si ce texte contient plusieurs versets fusionnés
+		const separatedVerses = this.separateVerses(text);
 
-		this.sqlStatements.push(`
+		if (separatedVerses) {
+			// Ajouter chaque verset séparément
+			for (const { verseNum: num, verseText } of separatedVerses) {
+				const escapedText = verseText.replace(/'/g, "''");
+
+				this.sqlStatements.push(`
+INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
+ (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
+ ${num},
+ '${escapedText}')
+ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+            `);
+			}
+		} else {
+			// Échapper les apostrophes et autres caractères problématiques
+			const escapedText = text.replace(/'/g, "''");
+
+			this.sqlStatements.push(`
 INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
 ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
  (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
@@ -942,6 +992,7 @@ INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
  '${escapedText}')
 ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
         `);
+		}
 	}
 }
 
