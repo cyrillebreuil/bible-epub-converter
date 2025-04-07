@@ -8,10 +8,10 @@ async function main() {
 	try {
 		// Configuration - ADAPTEZ CECI À VOTRE BIBLE
 		const config = {
-			epubPath: "./votre-bible.epub",
+			epubPath: "./bible_liturgique.epub",
 			translationInfo: {
-				code: "votre_code", // ex: seg21
-				name: "Nom Traduction", // ex: Segond 21
+				code: "aelf", // ex: seg21
+				name: "Traduction Officielle Liturgique", // ex: Segond 21
 				language: "Français",
 				languageCode: "fra",
 				regionCode: "FR",
