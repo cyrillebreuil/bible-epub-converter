@@ -19,7 +19,7 @@ async function main() {
 			},
 			debugMode: true,
 			debugBooks: ["GEN"], // Pour tester uniquement certains livres
-			debugChaptersLimit: 3, // Limiter le nombre de chapitres en debug
+			debugChaptersLimit: 5, // Limiter le nombre de chapitres en debug
 			saveDebugHtml: true,
 			debugDir: "./debug",
 			extractedDir: "./extracted_epub", // Dossier pour l'extraction complète
@@ -51,37 +51,7 @@ class BibleConverter {
 		this.sqlStatements = [];
 		this.bookMappings = this.initializeBookMappings();
 		this.currentBook = null;
-	}
-	// Méthode pour séparer les versets fusionnés
-	separateVerses(text) {
-		// Rechercher des motifs comme "21Hénok vécut..." où un numéro est directement suivi de texte
-		const versePattern =
-			/(\d+)([A-ZÉÈÊÀÂÇÙÛÔÏ].*?)(?=\s+\d+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)/g;
-		const verses = [];
-		let match;
-
-		// Vérifier si le texte contient des numéros de versets intégrés
-		const containsEmbeddedVerses = /\s\d+[A-ZÉÈÊÀÂÇÙÛÔÏ]/.test(text);
-
-		if (containsEmbeddedVerses) {
-			console.log(
-				"  Détection de versets fusionnés, séparation en cours...",
-			);
-
-			// Réinitialiser le regex pour commencer depuis le début
-			versePattern.lastIndex = 0;
-
-			while ((match = versePattern.exec(text)) !== null) {
-				const verseNum = parseInt(match[1], 10);
-				const verseText = match[2].trim();
-				verses.push({ verseNum, verseText });
-				console.log(
-					`    Verset séparé ${verseNum}: "${verseText.substring(0, 30)}..."`,
-				);
-			}
-		}
-
-		return verses.length > 0 ? verses : null;
+		this.processedChapters = new Set();
 	}
 
 	// Correspondances des noms de livres
@@ -373,15 +343,15 @@ class BibleConverter {
 			this.config.translationInfo;
 
 		this.sqlStatements.push(`
-INSERT INTO "translations" ("code", "name", "language", "languageCode", "regionCode") VALUES
-('${code}', '${name}', '${language}', '${languageCode}', '${regionCode}')
-ON CONFLICT ("code") DO NOTHING;
+    INSERT INTO "translations" ("code", "name", "language", "languageCode", "regionCode") VALUES
+    ('${code}', '${name}', '${language}', '${languageCode}', '${regionCode}')
+    ON CONFLICT ("code") DO NOTHING;
 
-INSERT INTO "testamentTranslations" ("isNewTestament", "translationID", "name") VALUES
-(FALSE, (SELECT "id" FROM "translations" WHERE "code" = '${code}'), 'Ancien Testament'),
-(TRUE, (SELECT "id" FROM "translations" WHERE "code" = '${code}'), 'Nouveau Testament')
-ON CONFLICT ("isNewTestament", "translationID") DO NOTHING;
-        `);
+    INSERT INTO "testamentTranslations" ("isNewTestament", "translationID", "name") VALUES
+    (FALSE, (SELECT "id" FROM "translations" WHERE "code" = '${code}'), 'Ancien Testament'),
+    (TRUE, (SELECT "id" FROM "translations" WHERE "code" = '${code}'), 'Nouveau Testament')
+    ON CONFLICT ("isNewTestament", "translationID") DO NOTHING;
+    `);
 	}
 
 	// Termine le fichier SQL
@@ -501,10 +471,10 @@ ON CONFLICT ("isNewTestament", "translationID") DO NOTHING;
 		const escapedName = bookName.replace(/'/g, "''");
 
 		this.sqlStatements.push(`
-INSERT INTO "bookTranslations" ("bookID", "translationID", "name") VALUES
-('${bookId}', (SELECT "id" FROM "translations" WHERE "code" = '${code}'), '${escapedName}')
-ON CONFLICT ("bookID", "translationID") DO NOTHING;
-        `);
+    INSERT INTO "bookTranslations" ("bookID", "translationID", "name") VALUES
+    ('${bookId}', (SELECT "id" FROM "translations" WHERE "code" = '${code}'), '${escapedName}')
+    ON CONFLICT ("bookID", "translationID") DO NOTHING;
+    `);
 	}
 
 	// Traite le contenu d'un livre
@@ -655,202 +625,246 @@ ON CONFLICT ("bookID", "translationID") DO NOTHING;
 	async extractVersesFromChapter($, bookId, chapterNum, fragment) {
 		console.log(`Extraction des versets du chapitre ${chapterNum}`);
 
-		// Si on a un fragment, se concentrer sur cette section
-		let $target = $;
-		if (fragment) {
-			console.log(`Recherche du fragment #${fragment}`);
-			const targetElement = $(`#${fragment}`);
-			if (targetElement.length) {
-				console.log(`Fragment #${fragment} trouvé!`);
-				// Ne pas recréer un contexte Cheerio, mais utiliser cet élément comme racine
-				$target = targetElement;
-			}
+		// Éviter le traitement en double des chapitres
+		const chapterKey = `${bookId}-${chapterNum}`;
+		if (this.processedChapters.has(chapterKey)) {
+			console.log(`Chapitre ${chapterNum} déjà traité, ignoré.`);
+			return;
+		}
+		this.processedChapters.add(chapterKey);
+
+		// Identifier tous les chapitres dans le document
+		const chapters = this.identifyChaptersInDocument($, bookId);
+
+		// Si aucun chapitre n'est trouvé, utiliser la méthode originale
+		if (chapters.length === 0) {
+			console.warn(
+				`Aucun chapitre trouvé dans le document, utilisation de la méthode de secours`,
+			);
+			return this.extractVersesWithFallbackMethod($, bookId, chapterNum);
 		}
 
-		// Analyser la structure du chapitre
-		if (this.config.debugMode) {
-			console.log(`\nAnalyse du chapitre ${chapterNum}:`);
-
-			// Examiner certains éléments clés
-			console.log("Éléments principaux:");
-			$("body > *")
-				.slice(0, 3)
-				.each((i, elem) => {
-					console.log(
-						`  ${i + 1}. <${elem.name}> class="${$(elem).attr("class") || ""}" id="${$(elem).attr("id") || ""}"`,
-					);
-				});
-
-			// Regarder les paragraphes pour voir s'ils contiennent des versets
-			console.log("\nÉchantillon de paragraphes:");
-			$("p")
-				.slice(0, 3)
-				.each((i, elem) => {
-					console.log(
-						`  P${i + 1}: "${$(elem).text().substring(0, 100)}..."`,
-					);
-				});
+		// Trouver le chapitre demandé
+		const chapter = chapters.find((ch) => ch.number === chapterNum);
+		if (!chapter) {
+			console.warn(`Chapitre ${chapterNum} non trouvé dans le document`);
+			return 0;
 		}
 
-		// Chercher des versets avec différentes structures possibles
-		let foundVerses = 0;
+		// Extraire les versets de ce chapitre spécifique
+		return this.extractVersesFromChapterElement($, chapter, bookId);
+	}
 
-		// Approche 1: Recherche par classe "verset"
-		$(".verset, p.verset").each((i, elem) => {
-			const text = $(elem).text().trim();
-			// Extraction du numéro de verset (au début du texte)
-			const verseMatch = text.match(/^(\d+)\s+(.+)/);
+	// Méthode pour identifier tous les chapitres dans le document
+	identifyChaptersInDocument($, bookId) {
+		const chapters = [];
+		const lowercaseBookId = bookId.toLowerCase();
 
-			if (verseMatch) {
-				const verseNum = parseInt(verseMatch[1], 10);
-				const verseText = verseMatch[2].trim();
+		// Rechercher les marqueurs de chapitres (pour la Bible AELF)
+		$("p.bib_chap_ctnr").each((i, elem) => {
+			const chapterElem = $(elem).find(
+				`span.intertitle10[id^='bib_${lowercaseBookId}_']`,
+			);
 
-				console.log(
-					`    Trouvé verset ${verseNum}: "${verseText.substring(0, 30)}..."`,
-				);
-				this.addVerse(bookId, chapterNum, verseNum, verseText);
-				foundVerses++;
+			if (chapterElem.length > 0) {
+				const chapterId = chapterElem.attr("id");
+				const parts = chapterId.split("_");
+				if (parts.length >= 3) {
+					const chapterNum = parseInt(parts[2], 10);
+
+					if (!isNaN(chapterNum)) {
+						console.log(
+							`Chapitre ${chapterNum} trouvé: ${chapterId}`,
+						);
+
+						chapters.push({
+							number: chapterNum,
+							element: $(elem),
+							id: chapterId,
+						});
+					}
+				}
 			}
 		});
 
-		// Approche 2: Paragraphes avec numéros de versets
-		if (foundVerses === 0) {
-			$("p").each((i, elem) => {
-				const text = $(elem).text().trim();
-				const verseMatch = text.match(/^(\d+)\s+(.+)/);
+		console.log(`${chapters.length} chapitres identifiés dans le document`);
+		return chapters;
+	}
 
-				if (verseMatch) {
-					const verseNum = parseInt(verseMatch[1], 10);
-					const verseText = verseMatch[2].trim();
+	// Méthode pour extraire les versets d'un chapitre spécifique
+	extractVersesFromChapterElement($, chapter, bookId) {
+		console.log(`Extraction des versets du chapitre ${chapter.number}...`);
 
-					console.log(
-						`    Trouvé verset ${verseNum}: "${verseText.substring(0, 30)}..."`,
-					);
-					this.addVerse(bookId, chapterNum, verseNum, verseText);
-					foundVerses++;
+		const lowercaseBookId = bookId.toLowerCase();
+		let versesFound = 0;
+		const verseElements = new Map();
+
+		// Trouver tous les versets de ce chapitre
+		$(`a.anchor[id^='bib_${lowercaseBookId}_${chapter.number}_']`).each(
+			(i, elem) => {
+				const verseId = $(elem).attr("id");
+				const parts = verseId.split("_");
+				const verseNum = parseInt(parts[parts.length - 1], 10);
+
+				if (!isNaN(verseNum)) {
+					verseElements.set(verseNum, $(elem));
 				}
-			});
-		}
+			},
+		);
 
-		// Approche 3: Chercher des spans numérotés (numéros de versets)
-		if (foundVerses === 0) {
-			// Trouver d'abord tous les numéros potentiels
-			const verseNumberElements = [];
-			$("span, sup, a").each((i, elem) => {
-				const text = $(elem).text().trim();
-				if (/^\d+$/.test(text)) {
-					verseNumberElements.push({
-						num: parseInt(text, 10),
-						elem: $(elem),
-					});
-				}
-			});
+		// Maintenant, pour chaque numéro de verset, extraire le texte
+		for (const [verseNum, verseElem] of verseElements.entries()) {
+			let verseText = this.extractVerseText($, verseElem, verseNum);
 
-			// Maintenant pour chaque numéro, essayer de trouver le texte du verset
-			for (const { num, elem } of verseNumberElements) {
-				// Plusieurs stratégies pour trouver le texte
+			if (verseText) {
+				// Nettoyage du texte
+				verseText = this.cleanVerseText(verseText);
 
-				// 1. Vérifier le parent direct
-				const parent = elem.parent();
-				let verseText = parent.text().replace(elem.text(), "").trim();
-
-				// 2. Si pas de texte utile, chercher dans les éléments suivants
-				if (!verseText || verseText.length < 5) {
-					// Trouver le texte suivant ce numéro jusqu'au prochain numéro
-					let nextSibling = elem.next();
-					let collectedText = "";
-
-					while (nextSibling.length > 0) {
-						// Si c'est un autre numéro de verset, arrêter
-						if (
-							nextSibling.text().match(/^\d+$/) &&
-							nextSibling.is("span, sup, a")
-						) {
-							break;
-						}
-
-						collectedText += " " + nextSibling.text();
-						nextSibling = nextSibling.next();
-					}
-
-					if (collectedText.trim()) {
-						verseText = collectedText.trim();
-					}
-				}
-
-				// Si on a trouvé du texte, l'ajouter
-				if (verseText && verseText.length > 5) {
-					console.log(
-						`    Trouvé verset ${num}: "${verseText.substring(0, 30)}..."`,
-					);
-					this.addVerse(bookId, chapterNum, num, verseText);
-					foundVerses++;
-				}
-			}
-		}
-
-		// Approche 4: Analyser le texte au complet pour trouver des motifs
-		if (foundVerses === 0) {
-			// Récupérer tout le texte et chercher les motifs de versets
-			const fullText = $("body").text();
-
-			// Rechercher des motifs comme "1 Au commencement...", "2 Dieu dit..."
-			const versePattern = /(\d+)\s+([^0-9][^\n]+)(?=\s+\d+\s+|$)/g;
-			let match;
-
-			while ((match = versePattern.exec(fullText)) !== null) {
-				const verseNum = parseInt(match[1], 10);
-				const verseText = match[2].trim();
+				// Ajouter le verset à la base de données
+				this.addVerse(bookId, chapter.number, verseNum, verseText);
+				versesFound++;
 
 				console.log(
-					`    Extrait verset ${verseNum}: "${verseText.substring(0, 30)}..."`,
+					`    Verset ${verseNum}: "${verseText.substring(0, 50)}${verseText.length > 50 ? "..." : ""}"`,
 				);
-				this.addVerse(bookId, chapterNum, verseNum, verseText);
-				foundVerses++;
 			}
 		}
 
-		// Si aucun verset trouvé, examiner la structure HTML plus en détail
-		if (foundVerses === 0) {
-			console.warn(
-				`ATTENTION: Aucun verset trouvé pour ${bookId} chapitre ${chapterNum}`,
-			);
+		console.log(
+			`  Chapitre ${chapter.number}: ${versesFound} versets trouvés`,
+		);
+		return versesFound;
+	}
 
-			// Examiner la structure HTML pour le débogage
+	// Extraire le texte d'un verset
+	extractVerseText($, verseElem, verseNum) {
+		// Si l'élément est dans un paragraphe poétique
+		const verseAnchor = verseElem.parent();
+		let verseText = "";
+
+		// Cas 1: Verset dans un paragraphe avec class="verset_anchor"
+		if (verseAnchor.hasClass("verset_anchor")) {
+			// Le texte initial
+			verseText = verseAnchor.text().trim();
+
+			// Trouver les lignes suivantes (retraits poétiques) jusqu'au prochain verset
+			let nextElem = verseAnchor.next();
+			while (
+				nextElem.length &&
+				!nextElem.find("a.anchor").length &&
+				(nextElem.hasClass("retrait") ||
+					nextElem.hasClass("retrait1") ||
+					nextElem.hasClass("retrait2") ||
+					nextElem.hasClass("verset_no_anchor"))
+			) {
+				verseText += " " + nextElem.text().trim();
+				nextElem = nextElem.next();
+			}
+		}
+		// Cas 2: Verset dans un paragraphe ordinaire avec d'autres versets
+		else {
+			const parentParagraph = verseElem.closest("p");
+
+			// Si le paragraphe contient plusieurs versets, c'est plus complexe
+			const allVerseAnchors = parentParagraph.find("a.anchor");
+
+			if (allVerseAnchors.length === 1) {
+				// Cas simple: un seul verset dans le paragraphe
+				verseText = parentParagraph.text().trim();
+			} else {
+				// Cas complexe: plusieurs versets dans le même paragraphe
+				// Trouver ce verset et le texte jusqu'au prochain verset
+				const fullText = parentParagraph.text();
+
+				// Obtenir l'index de ce numéro de verset dans le texte
+				const verseStart = fullText.indexOf(verseNum.toString());
+				if (verseStart !== -1) {
+					// Chercher le prochain numéro de verset
+					const nextVersePattern = new RegExp(
+						`\\s(${verseNum + 1})\\s`,
+						"g",
+					);
+					const nextVerseMatch = nextVersePattern.exec(
+						fullText.substring(verseStart),
+					);
+
+					if (nextVerseMatch) {
+						// Extraire le texte entre ce verset et le suivant
+						verseText = fullText
+							.substring(
+								verseStart,
+								verseStart + nextVerseMatch.index,
+							)
+							.trim();
+					} else {
+						// C'est le dernier verset du paragraphe
+						verseText = fullText.substring(verseStart).trim();
+					}
+				}
+			}
+		}
+
+		return verseText;
+	}
+
+	// Nettoyage amélioré du texte des versets
+	cleanVerseText(text) {
+		// Suppression du numéro de verset au début
+		let cleanText = text.replace(/^\d+\s*/, "");
+
+		// Nettoyage standard
+		cleanText = cleanText
+			.replace(/\([^)]*\)/g, "") // Supprimer annotations entre parenthèses
+			.replace(/\s+/g, " ") // Normaliser les espaces
+			.replace(/\s+([.,;:!?»])/g, "$1") // Supprimer espaces avant ponctuation
+			.replace(/\n+/g, " ") // Remplacer retours à la ligne par espaces
+			.trim();
+
+		return cleanText;
+	}
+
+	// Méthode de secours pour l'extraction des versets
+	extractVersesWithFallbackMethod($, bookId, chapterNum) {
+		console.log(
+			`Utilisation de la méthode de secours pour ${bookId} chapitre ${chapterNum}`,
+		);
+
+		// Collecter tout le texte du document
+		let fullText = $("body").text().trim();
+
+		// Nettoyer le texte pour le parsing
+		fullText = fullText
+			.replace(/\n+/g, "\n")
+			.replace(/\([^)]*\)/g, "") // Supprimer annotations entre parenthèses
+			.replace(/[A-Z\s]{5,}/g, "") // Supprimer titres en majuscules
+			.trim();
+
+		// Extraction des versets par motif de numéro + texte
+		const versePattern =
+			/(\d+)\s+([A-ZÉÈÊÀÂÇÙÛÔÏ].*?)(?=\s+\d+\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)/gs;
+		let match;
+		let versesFound = 0;
+
+		while ((match = versePattern.exec(fullText)) !== null) {
+			const verseNum = parseInt(match[1], 10);
+			let verseText = match[2].trim();
+
+			// Nettoyage du texte
+			verseText = this.cleanVerseText(verseText);
+
+			// Ajouter à la base de données
+			this.addVerse(bookId, chapterNum, verseNum, verseText);
+			versesFound++;
+
 			console.log(
-				`\nExamen détaillé de la structure HTML du chapitre ${chapterNum}:`,
+				`    Verset ${verseNum}: "${verseText.substring(0, 50)}${verseText.length > 50 ? "..." : ""}"`,
 			);
-
-			// Compter les types d'éléments
-			const elementCounts = {};
-			$("*").each((i, elem) => {
-				const tagName = elem.name;
-				elementCounts[tagName] = (elementCounts[tagName] || 0) + 1;
-			});
-
-			console.log("Distribution des éléments HTML:");
-			Object.entries(elementCounts)
-				.sort((a, b) => b[1] - a[1])
-				.slice(0, 10)
-				.forEach(([tag, count]) => {
-					console.log(`  ${tag}: ${count}`);
-				});
-
-			// Si on a beaucoup de spans, examiner leur contenu
-			if (elementCounts["span"] > 10) {
-				console.log("\nExamen des spans dans le document:");
-				$("span")
-					.slice(0, 10)
-					.each((i, elem) => {
-						console.log(
-							`  Span ${i + 1}: "${$(elem).text().substring(0, 30)}..."` +
-								` (class: "${$(elem).attr("class") || ""}")`,
-						);
-					});
-			}
 		}
 
-		console.log(`  Chapitre ${chapterNum}: ${foundVerses} versets trouvés`);
+		console.log(
+			`  Chapitre ${chapterNum} (méthode de secours): ${versesFound} versets trouvés`,
+		);
+		return versesFound;
 	}
 
 	// Méthode standard pour l'extraction directe
@@ -859,140 +873,114 @@ ON CONFLICT ("bookID", "translationID") DO NOTHING;
 			"Extraction directe du contenu (sans liens de chapitres)...",
 		);
 
-		let currentChapter = 0;
-		let foundChapters = new Set();
-		let foundVerses = 0;
+		// Identifier tous les chapitres dans le document
+		const chapters = this.identifyChaptersInDocument($, bookId);
 
-		// 1. Essayer de trouver les chapitres par les titres et en-têtes
-		$("h1, h2, h3, h4, h5, h6, .chapitre, .chapter").each((i, elem) => {
-			const text = $(elem).text().trim();
-			const chapterMatch = text.match(/(?:chapitre|chapter)?\s*(\d+)/i);
-
-			if (chapterMatch) {
-				currentChapter = parseInt(chapterMatch[1], 10);
-				foundChapters.add(currentChapter);
-				console.log(
-					`  Chapitre ${currentChapter} détecté via élément ${elem.name}`,
-				);
-			}
-		});
-
-		// Si toujours aucun chapitre, utiliser le chapitre 1 par défaut
-		if (foundChapters.size === 0) {
-			console.log(
-				"Aucun chapitre détecté, utilisation du chapitre 1 par défaut",
-			);
-			currentChapter = 1;
-			foundChapters.add(1);
-		}
-
-		// 2. Essayer de trouver les versets
-		// Essayer différentes approches de détection de versets
-
-		// Approche 1: Paragraphes avec numéros de versets
-		$("p").each((i, elem) => {
-			const text = $(elem).text().trim();
-			const verseMatch = text.match(/^(\d+)\s+(.+)/);
-
-			if (verseMatch) {
-				const verseNum = parseInt(verseMatch[1], 10);
-				const verseText = verseMatch[2].trim();
-
-				// Si verset 1 et pas au début, considérer un changement de chapitre
-				if (verseNum === 1 && i > 0 && currentChapter < 150) {
-					currentChapter++;
-					console.log(
-						`  Passage au chapitre ${currentChapter} (détecté via verset 1)`,
-					);
-				}
-
-				console.log(
-					`    Verset ${verseNum} (Chapitre ${currentChapter}): "${verseText.substring(0, 30)}..."`,
-				);
-
-				// Ajouter le verset à la base de données
-				this.addVerse(bookId, currentChapter, verseNum, verseText);
-				foundVerses++;
-			}
-		});
-
-		// Si aucun verset n'a été trouvé, essayer d'autres approches
-		if (foundVerses === 0) {
+		if (chapters.length === 0) {
 			console.warn(
-				`ATTENTION: Aucun verset n'a été trouvé pour ${bookId}`,
+				`Aucun chapitre trouvé pour ${bookId}, utilisation de la méthode de secours`,
 			);
-			console.log("Analyse du contenu pour motifs de versets...");
-
-			// Récupérer tout le texte et chercher les motifs 1 texte, 2 texte, etc.
-			const fullText = $("body").text();
-
-			// Déboguer un extrait du texte complet
-			console.log(`Extrait du texte: ${fullText.substring(0, 300)}...`);
-
-			// Rechercher des motifs comme "1 Au commencement...", "2 Dieu dit..."
-			const versePattern = /(\d+)\s+([^0-9][^\n]+)(?=\s+\d+\s+|$)/g;
-			let match;
-
-			while ((match = versePattern.exec(fullText)) !== null) {
-				const verseNum = parseInt(match[1], 10);
-				const verseText = match[2].trim();
-
-				// Détection de changement de chapitre (si verset 1 après des versets plus élevés)
-				if (verseNum === 1 && foundVerses > 0) {
-					currentChapter++;
-					console.log(
-						`  Passage au chapitre ${currentChapter} (détecté via verset 1 dans le texte)`,
-					);
-				}
-
-				console.log(
-					`    Verset ${verseNum} (Chapitre ${currentChapter}): "${verseText.substring(0, 30)}..."`,
-				);
-				this.addVerse(bookId, currentChapter, verseNum, verseText);
-				foundVerses++;
-			}
+			return this.extractVersesWithFallbackMethod($, bookId, 1);
 		}
+
+		// Limiter le nombre de chapitres en mode debug
+		const chaptersToProcess = this.config.debugChaptersLimit
+			? chapters.slice(0, this.config.debugChaptersLimit)
+			: chapters;
 
 		console.log(
-			`  Total: ${foundChapters.size} chapitres, ${foundVerses} versets trouvés`,
+			`Traitement de ${chaptersToProcess.length} chapitres sur ${chapters.length} trouvés`,
 		);
+
+		// Traiter chaque chapitre
+		for (const chapter of chaptersToProcess) {
+			await this.extractVersesFromChapterElement($, chapter, bookId);
+		}
 	}
 
-	// Ajoute un verset à la base de données
 	// Ajoute un verset à la base de données
 	addVerse(bookId, chapterNum, verseNum, text) {
 		const { code } = this.config.translationInfo;
 
-		// Vérifier si ce texte contient plusieurs versets fusionnés
-		const separatedVerses = this.separateVerses(text);
+		// Vérification finale et nettoyage du texte
+		let cleanText = text;
 
-		if (separatedVerses) {
-			// Ajouter chaque verset séparément
-			for (const { verseNum: num, verseText } of separatedVerses) {
-				const escapedText = verseText.replace(/'/g, "''");
+		// Vérifier si le verset a encore un numéro au début (parfois le cas pour certains versets)
+		if (cleanText.match(/^\d+\s/)) {
+			cleanText = cleanText.replace(/^\d+\s/, "");
+		}
 
+		// Dernière vérification pour les numéros de versets intégrés
+		const verseSegments = this.checkForEmbeddedVerses(cleanText, verseNum);
+
+		if (verseSegments) {
+			// Traiter chaque segment comme un verset distinct
+			for (const segment of verseSegments) {
+				const escapedText = segment.text.replace(/'/g, "''");
 				this.sqlStatements.push(`
-INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
- (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
- ${num},
- '${escapedText}')
-ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-            `);
+        INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+        ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
+         (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
+         ${segment.num},
+         '${escapedText}')
+        ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+        `);
 			}
 		} else {
-			// Échapper les apostrophes et autres caractères problématiques
-			const escapedText = text.replace(/'/g, "''");
-
+			// Traiter comme un verset normal
+			const escapedText = cleanText.replace(/'/g, "''");
 			this.sqlStatements.push(`
-INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
- (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
- ${verseNum},
- '${escapedText}')
-ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-        `);
+      INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+      ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
+       (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
+       ${verseNum},
+       '${escapedText}')
+      ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+      `);
 		}
+	}
+
+	// Vérifie si un texte contient des numéros de versets intégrés
+	checkForEmbeddedVerses(text, currentVerseNum) {
+		// Rechercher des motifs comme "21 Hénok vécut..."
+		const versePattern =
+			/\s+(\d+)\s+([A-ZÉÈÊÀÂÇÙÛÔÏ].*?)(?=\s+\d+\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)/g;
+		let match;
+		const verseSegments = [];
+
+		// Vérifier si le texte contient des numéros intégrés
+		if (text.match(/\s+\d+\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]/)) {
+			// Ajouter le premier segment (jusqu'au premier numéro intégré)
+			const firstSegmentMatch = text.match(
+				/^(.*?)(?=\s+\d+\s+[A-ZÉÈÊÀÂÇÙÛÔÏ])/,
+			);
+			if (firstSegmentMatch && firstSegmentMatch[1].trim()) {
+				verseSegments.push({
+					num: currentVerseNum,
+					text: firstSegmentMatch[1].trim(),
+				});
+			}
+
+			// Ajouter tous les segments avec numéros intégrés
+			while ((match = versePattern.exec(text)) !== null) {
+				const verseNum = parseInt(match[1], 10);
+				const verseText = match[2].trim();
+
+				if (verseText) {
+					verseSegments.push({
+						num: verseNum,
+						text: verseText,
+					});
+				}
+			}
+
+			// Si on a trouvé des segments, les retourner
+			if (verseSegments.length > 0) {
+				return verseSegments;
+			}
+		}
+
+		return null;
 	}
 }
 
