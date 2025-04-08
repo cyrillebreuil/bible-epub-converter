@@ -801,66 +801,10 @@ class BibleConverter {
 						// Déboguer : sauvegarder le HTML du chapitre
 						if (this.config.saveDebugHtml) {
 							const debugFileName = `${bookId}_${chapterNum}.html`;
-
-							// Isoler spécifiquement ce chapitre pour le debugging
-							const $debugCopy = cheerio.load(chapterContent);
-
-							// Chercher l'élément du chapitre et ses contenus
-							const $chapterElement = $debugCopy(`#${fragment}`);
-
-							if ($chapterElement.length) {
-								// Créer un nouvel HTML contenant uniquement ce chapitre
-								const $debugContainer =
-									$debugCopy("<div></div>");
-
-								// Ajouter les infos du chapitre
-								$debugContainer.append(
-									`<h1>Chapitre ${chapterNum} de ${bookId}</h1>`,
-								);
-
-								// Ajouter l'élément du chapitre et son contenu
-								$debugContainer.append($chapterElement);
-
-								// Trouver tous les versets associés à ce chapitre
-								const bookLower = bookId.toLowerCase();
-								const genPrefix =
-									bookId === "GEN"
-										? `bib_gn_${chapterNum}_`
-										: null;
-								const bookPrefix = `bib_${bookLower}_${chapterNum}_`;
-
-								let verseElements;
-								if (genPrefix) {
-									verseElements = $debugCopy(
-										`a[id^='${genPrefix}'], a[id^='${bookPrefix}']`,
-									).closest("p");
-								} else {
-									verseElements = $debugCopy(
-										`a[id^='${bookPrefix}']`,
-									).closest("p");
-								}
-
-								$debugContainer.append(verseElements);
-
-								// Sauvegarder uniquement le contenu filtré
-								await fs.writeFile(
-									path.join(
-										this.config.debugDir,
-										debugFileName,
-									),
-									$debugContainer.html(),
-								);
-							} else {
-								// Si on ne trouve pas l'élément spécifique, sauvegarder tout le HTML mais avec un indicateur
-								await fs.writeFile(
-									path.join(
-										this.config.debugDir,
-										debugFileName,
-									),
-									`<!-- Chapitre complet, élément spécifique non trouvé -->\n${$.html()}`,
-								);
-							}
-
+							await fs.writeFile(
+								path.join(this.config.debugDir, debugFileName),
+								$.html(),
+							);
 							console.log(
 								`HTML du chapitre sauvegardé: ${debugFileName}`,
 							);
@@ -868,6 +812,9 @@ class BibleConverter {
 
 						// Marquer ce chapitre comme traité
 						this.processedChapters.add(chapterKey);
+
+						// Enregistrer ce chapitre
+						this.addChapter(bookId, chapterNum);
 
 						// Trouver l'élément du chapitre en utilisant le fragment comme ID
 						if (fragment) {
@@ -989,8 +936,6 @@ class BibleConverter {
 						);
 						continue;
 					}
-
-					// Marquer ce chapitre comme traité
 					this.processedChapters.add(chapterKey);
 
 					// Extraire les versets de ce chapitre
@@ -1020,11 +965,8 @@ class BibleConverter {
 			this.processedVerses.set(chapterKey, new Set());
 		}
 
-		// Ajouter une entrée pour le chapitre si ce n'est pas déjà fait
-		if (!this.processedChapters.has(chapterKey)) {
-			this.addChapter(bookId, chapterNum);
-			this.processedChapters.add(chapterKey);
-		}
+		// Ajouter une entrée pour le chapitre
+		this.addChapter(bookId, chapterNum);
 
 		// D'abord, extraire les versets des paragraphes contenant plusieurs ancres
 		const paragraphsWithMultiAnchors = [];
@@ -1443,11 +1385,8 @@ class BibleConverter {
 			this.processedVerses.set(chapterKey, new Set());
 		}
 
-		// Ajouter une entrée pour le chapitre seulement si ce n'est pas déjà fait
-		if (!this.processedChapters.has(chapterKey)) {
-			this.addChapter(bookId, chapterNum);
-			this.processedChapters.add(chapterKey);
-		}
+		// Ajouter une entrée pour le chapitre
+		this.addChapter(bookId, chapterNum);
 
 		// Rechercher tous les éléments avec class="calibre17"
 		const calibre17Elements = $("b.calibre17");
@@ -1823,13 +1762,13 @@ class BibleConverter {
 						.has(segment.num)
 				) {
 					this.sqlStatements.push(`
-                       INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-                       ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
-                       (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
-                       ${segment.num},
-                       '${escapedText}')
-                       ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-                       `);
+                    INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+                    ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
+                    (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
+                    ${segment.num},
+                    '${escapedText}')
+                    ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+                    `);
 
 					// Marquer ce verset comme traité
 					this.processedVerses
@@ -1853,13 +1792,13 @@ class BibleConverter {
 					.has(verseNum)
 			) {
 				this.sqlStatements.push(`
-                   INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-                   ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
-                   (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
-                   ${verseNum},
-                   '${escapedText}')
-                   ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-                   `);
+                INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+                ((SELECT "id" FROM "chapters" WHERE "bookID" = '${bookId}' AND "number" = ${chapterNum}),
+                (SELECT "id" FROM "translations" WHERE "code" = '${code}'),
+                ${verseNum},
+                '${escapedText}')
+                ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+                `);
 
 				// Marquer ce verset comme traité
 				this.processedVerses
