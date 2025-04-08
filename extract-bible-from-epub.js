@@ -1034,6 +1034,72 @@ class BibleConverter {
 		const genPrefix = bookId === "GEN" ? `bib_gn_${chapterNum}_` : null;
 		const bookPrefix = `bib_${bookLower}_${chapterNum}_`;
 
+		// AJOUT: Chercher d'abord les versets simples (format "anchor") dans des paragraphes séparés
+		const simpleAnchors = $(`a.anchor[id^='${genPrefix || bookPrefix}']`);
+		console.log(
+			`Recherche des versets simples: trouvé ${simpleAnchors.length} ancres simples`,
+		);
+
+		let versesFound = 0;
+
+		// Dans la section où vous traitez les ancres simples (début de extractVersetsFromChapter)
+		simpleAnchors.each((i, anchor) => {
+			try {
+				const anchorId = $(anchor).attr("id");
+				const parts = anchorId.split("_");
+				const verseNum = parseInt(parts[parts.length - 1], 10);
+
+				if (isNaN(verseNum)) return;
+
+				// Vérifier si ce verset a déjà été traité
+				if (this.processedVerses.get(chapterKey).has(verseNum)) {
+					return;
+				}
+
+				// Récupérer le texte du paragraphe contenant cette ancre
+				const paragraph = $(anchor).closest("p");
+				let verseText = "";
+
+				// MODIFICATION: Récupérer tout le texte du paragraphe, pas seulement des éléments calibre17
+				// D'abord essayer d'extraire le texte des éléments calibre17
+				paragraph.find("b.calibre17").each((j, elem) => {
+					const $clone = $(elem).clone();
+					$clone.find("sup").remove();
+					verseText += $clone.text().trim() + " ";
+				});
+
+				// Si aucun texte n'a été trouvé ou s'il est trop court, prendre tout le texte du paragraphe
+				if (!verseText.trim() || verseText.trim().length < 10) {
+					// Cloner le paragraphe pour manipulation
+					const $clone = paragraph.clone();
+
+					// Supprimer l'ancre du numéro de verset et les annotations
+					$clone.find(`a[id='${anchorId}']`).remove();
+					$clone.find("sup").remove();
+
+					// Récupérer tout le texte restant
+					verseText = $clone.text().trim();
+				}
+
+				if (verseText.trim()) {
+					const cleanText = this.finalizeVerseText(verseText);
+					this.addVerse(bookId, chapterNum, verseNum, cleanText);
+					versesFound++;
+					console.log(
+						`  Verset simple ${verseNum} extrait: "${cleanText.substring(0, 50)}${cleanText.length > 50 ? "..." : ""}"`,
+					);
+
+					// Marquer ce verset comme traité
+					this.processedVerses.get(chapterKey).add(verseNum);
+				}
+			} catch (error) {
+				console.error(
+					`Erreur lors de l'extraction du verset simple:`,
+					error,
+				);
+			}
+		});
+
 		$("p").each((i, para) => {
 			const paragraph = $(para);
 			let versetsAnchors = [];
@@ -1084,8 +1150,6 @@ class BibleConverter {
 			`Trouvé ${verseAnchors.length} ancres de versets individuelles dans le chapitre ${chapterNum}`,
 		);
 
-		let versesFound = 0;
-
 		// Parcourir chaque ancre de verset
 		verseAnchors.each((i, anchor) => {
 			try {
@@ -1101,7 +1165,7 @@ class BibleConverter {
 				}
 
 				// Extraire le texte du verset
-				const verseText = this.extractVerseTextFromAnchor(
+				let verseText = this.extractVerseTextFromAnchor(
 					$,
 					anchor,
 					verseNum,
@@ -1143,10 +1207,81 @@ class BibleConverter {
 			}
 		}
 
-		console.log(`Chapitre ${chapterNum}: ${versesFound} versets trouvés`);
-
-		// Vérifier les versets manquants
+		// Vérifier les versets manquants normaux
 		this.checkForMissingVerses($, bookId, chapterNum);
+
+		// AJOUT: Vérifier spécifiquement les premiers versets
+		this.checkFirstVerses($, bookId, chapterNum);
+
+		console.log(`Chapitre ${chapterNum}: ${versesFound} versets trouvés`);
+	}
+
+	// Vérifie spécifiquement si les premiers versets d'un chapitre existent
+	checkFirstVerses($, bookId, chapterNum) {
+		const chapterKey = `${bookId}-${chapterNum}`;
+		if (!this.processedVerses.has(chapterKey)) {
+			return;
+		}
+
+		const processedVerseSet = this.processedVerses.get(chapterKey);
+		const firstVerses = [1, 2, 3, 4];
+		const missingFirstVerses = firstVerses.filter(
+			(v) => !processedVerseSet.has(v),
+		);
+
+		if (missingFirstVerses.length > 0) {
+			console.log(
+				`Premiers versets manquants pour ${bookId} ${chapterNum}: ${missingFirstVerses.join(", ")}`,
+			);
+
+			// Rechercher spécifiquement le paragraphe contenant les premiers versets
+			$("p").each((i, para) => {
+				const $para = $(para);
+				const paraText = $para.text();
+
+				// Vérifier si ce paragraphe contient un des premiers versets manquants
+				for (const verseNum of missingFirstVerses) {
+					if (
+						paraText.match(
+							new RegExp(`${verseNum}\\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]`),
+						)
+					) {
+						// Extraire le texte pour ce verset
+						let verseText = "";
+						$para.find("b.calibre17").each((j, elem) => {
+							if (
+								$(elem)
+									.text()
+									.match(
+										new RegExp(
+											`${verseNum}\\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]`,
+										),
+									)
+							) {
+								verseText = $(elem).text().trim();
+								// Supprimer le numéro du verset
+								verseText = verseText.replace(
+									new RegExp(`^${verseNum}\\s+`),
+									"",
+								);
+
+								if (verseText) {
+									this.addVerse(
+										bookId,
+										chapterNum,
+										verseNum,
+										this.finalizeVerseText(verseText),
+									);
+									console.log(
+										`  Premier verset ${verseNum} récupéré: "${verseText.substring(0, 50)}${verseText.length > 50 ? "..." : ""}"`,
+									);
+								}
+							}
+						});
+					}
+				}
+			});
+		}
 	}
 
 	// Extrait les versets d'un paragraphe contenant plusieurs ancres
@@ -1210,9 +1345,51 @@ class BibleConverter {
 			// Supprimer les annotations
 			$clone.find("sup").remove();
 
-			// Si c'est le dernier verset du paragraphe
-			if (i === anchorArray.length - 1) {
-				// Supprimer tout ce qui précède cette ancre
+			// CORRECTION: Traitement spécial pour le premier verset dans un paragraphe
+			if (i === 0) {
+				// Si c'est le premier verset du paragraphe
+				const currentAnchorHtml = $(anchor).prop("outerHTML");
+
+				// Séparer le contenu avant et après l'ancre
+				const htmlParts = $clone.html().split(currentAnchorHtml);
+
+				// Si nous avons un contenu après l'ancre
+				if (htmlParts.length > 1) {
+					if (i < anchorArray.length - 1) {
+						// S'il y a une ancre suivante, extraire le texte jusqu'à cette ancre
+						const nextAnchor = anchorArray[i + 1];
+						const nextAnchorHtml = $(nextAnchor).prop("outerHTML");
+						const nextParts = htmlParts[1].split(nextAnchorHtml);
+
+						// Créer un DOM temporaire avec ce contenu
+						const temp = $("<div></div>").html(nextParts[0]);
+
+						// Collecter le texte des éléments calibre17
+						temp.find("b.calibre17").each((j, elem) => {
+							verseText += $(elem).text() + " ";
+						});
+
+						// Si pas d'éléments calibre17, prendre tout le texte
+						if (!verseText.trim() && temp.text().trim()) {
+							verseText = temp.text().trim();
+						}
+					} else {
+						// Si c'est le seul verset, prendre tout le texte après l'ancre
+						const temp = $("<div></div>").html(htmlParts[1]);
+
+						// Collecter le texte des éléments calibre17
+						temp.find("b.calibre17").each((j, elem) => {
+							verseText += $(elem).text() + " ";
+						});
+
+						// Si pas d'éléments calibre17, prendre tout le texte
+						if (!verseText.trim() && temp.text().trim()) {
+							verseText = temp.text().trim();
+						}
+					}
+				}
+			} else if (i === anchorArray.length - 1) {
+				// Si c'est le dernier verset du paragraphe
 				const currentAnchorHtml = $(anchor).prop("outerHTML");
 				const htmlParts = $clone.html().split(currentAnchorHtml);
 
@@ -1231,7 +1408,7 @@ class BibleConverter {
 					}
 				}
 			} else {
-				// Ce n'est pas le dernier verset
+				// Pour les versets au milieu
 				const nextAnchor = anchorArray[i + 1];
 				const currentAnchorHtml = $(anchor).prop("outerHTML");
 				const nextAnchorHtml = $(nextAnchor).prop("outerHTML");
@@ -1284,6 +1461,7 @@ class BibleConverter {
 
 	// Extrait le texte d'un verset à partir de son ancre
 	extractVerseTextFromAnchor($, anchor, verseNum) {
+		// Fonction pour collecter le texte sans annotations
 		const collectText = (elem) => {
 			const $clone = $(elem).clone();
 			$clone.find("sup").remove();
@@ -1291,129 +1469,73 @@ class BibleConverter {
 		};
 
 		let verseText = "";
-		const parentElem = $(anchor).parent();
+		const anchorId = $(anchor).attr("id");
 
-		// 1. Si c'est une ancre de type anchor standard
-		if ($(anchor).hasClass("anchor")) {
-			// Collecter le texte de cet élément et des retraits qui suivent
-			if (parentElem.find("b.calibre17").length > 0) {
-				parentElem.find("b.calibre17").each((i, elem) => {
-					verseText += collectText(elem) + " ";
-				});
+		// Extraire tout le texte du paragraphe contenant cette ancre
+		const paragraph = $(anchor).closest("p");
+
+		// Créer une copie propre du paragraphe sans les annotations
+		const $cleanPara = paragraph.clone();
+		$cleanPara.find("sup").remove();
+
+		// Option 1: Récupérer tout le texte du paragraphe
+		let paraText = $cleanPara.text().trim();
+
+		// Vérifier s'il y a un élément calibre17 et extraire son texte complet
+		let calibreText = "";
+		$cleanPara.find("b.calibre17").each((j, elem) => {
+			// Récupérer tout le texte, y compris celui des éléments smallcaps3
+			const elemText = $(elem).text().trim();
+			if (elemText) {
+				calibreText += elemText + " ";
 			}
+		});
 
-			// Si c'est un paragraphe avec retraits
-			if (
-				parentElem.hasClass("verset_anchor") ||
-				parentElem.hasClass("verset_no_anchor")
-			) {
-				let nextElem = parentElem.next();
+		// Utiliser le texte de calibre17 s'il existe, sinon le texte du paragraphe
+		verseText = calibreText.trim() || paraText;
 
-				// Collecter les retraits suivants jusqu'à trouver une autre ancre ou un titre
-				while (
-					nextElem.length &&
-					(nextElem.hasClass("retrait") ||
-						nextElem.hasClass("retrait1") ||
-						nextElem.hasClass("retrait2") ||
-						nextElem.hasClass("verset_no_anchor")) &&
-					!nextElem.find("a.anchor, a.anchor1, a.anchor2, a.anchor3")
-						.length &&
-					!nextElem.hasClass("intertitle9")
-				) {
-					nextElem.find("b.calibre17").each((i, elem) => {
-						verseText += collectText(elem) + " ";
-					});
-
-					nextElem = nextElem.next();
-				}
-			}
-		}
-		// 2. Si c'est une ancre de type anchor1, anchor2, anchor3
-		else if (
-			$(anchor).hasClass("anchor1") ||
-			$(anchor).hasClass("anchor2") ||
-			$(anchor).hasClass("anchor3")
+		// Chercher aussi dans les paragraphes de retrait suivants
+		let nextElem = paragraph.next();
+		while (
+			nextElem.length &&
+			(nextElem.hasClass("retrait") ||
+				nextElem.hasClass("retrait1") ||
+				nextElem.hasClass("retrait2") ||
+				nextElem.hasClass("verset_no_anchor"))
 		) {
-			// Ces ancres sont généralement dans un paragraphe contenant plusieurs versets
-			// Nous devons extraire uniquement le texte qui appartient à ce verset
+			// Ne prendre le paragraphe suivant que s'il ne contient pas d'ancre de verset
+			if (nextElem.find("a.anchor").length === 0) {
+				const $cleanNext = nextElem.clone();
+				$cleanNext.find("sup").remove();
 
-			// Trouver tous les éléments calibre17 après cette ancre et avant la prochaine ancre
-			const paragraph = $(anchor).closest("p");
-			const anchorId = $(anchor).attr("id");
-			const fullHtml = paragraph.html();
+				// Extraire le texte des éléments calibre17
+				nextElem.find("b.calibre17").each((i, elem) => {
+					verseText += " " + $(elem).text().trim();
+				});
 
-			// Trouver la position de l'ancre dans le paragraphe
-			const parts = fullHtml.split($(anchor).prop("outerHTML"));
-
-			if (parts.length > 1) {
-				// Créer un DOM temporaire pour manipuler le contenu après l'ancre
-				const $afterAnchor = $("<div></div>").html(parts[1]);
-
-				// Trouver la prochaine ancre
-				const nextAnchor = $afterAnchor
-					.find("a.anchor1, a.anchor2, a.anchor3")
-					.first();
-
-				if (nextAnchor.length) {
-					// Il y a une autre ancre, obtenir le texte jusqu'à cette ancre
-					const nextAnchorHtml = nextAnchor.prop("outerHTML");
-					const beforeNextParts = $afterAnchor
-						.html()
-						.split(nextAnchorHtml);
-
-					if (beforeNextParts.length > 0) {
-						const $textBeforeNext = $("<div></div>").html(
-							beforeNextParts[0],
-						);
-
-						// Supprimer les annotations
-						$textBeforeNext.find("sup").remove();
-
-						// Collecter le texte des éléments calibre17
-						$textBeforeNext.find("b.calibre17").each((i, elem) => {
-							verseText += $(elem).text() + " ";
-						});
-
-						// Si pas de texte calibre17, prendre tout le texte
-						if (
-							!verseText.trim() &&
-							$textBeforeNext.text().trim()
-						) {
-							verseText = $textBeforeNext.text().trim();
-						}
-					}
-				} else {
-					// C'est la dernière ancre, prendre tout le texte restant
-					$afterAnchor.find("sup").remove();
-
-					// Collecter le texte des éléments calibre17
-					$afterAnchor.find("b.calibre17").each((i, elem) => {
-						verseText += $(elem).text() + " ";
-					});
-
-					// Si pas de texte calibre17, prendre tout le texte
-					if (!verseText.trim() && $afterAnchor.text().trim()) {
-						verseText = $afterAnchor.text().trim();
-					}
+				// S'il n'y a pas d'élément calibre17, prendre tout le texte
+				if (nextElem.find("b.calibre17").length === 0) {
+					verseText += " " + $cleanNext.text().trim();
 				}
+			} else {
+				// Si on trouve une ancre, on s'arrête
+				break;
 			}
+
+			nextElem = nextElem.next();
 		}
 
-		// Si nous n'avons pas trouvé de texte, essayer une recherche générale
-		if (!verseText.trim()) {
-			// Rechercher dans le texte complet en utilisant le numéro de verset
+		// Si le texte est toujours trop court, essayer de rechercher dans le document entier
+		if (verseText.length < 10) {
 			const bodyText = $("body").text();
-			const pattern = new RegExp(
+			const versePattern = new RegExp(
 				`\\b${verseNum}\\s+([A-ZÉÈÊÀÂÇÙÛÔÏ].*?)(?=\\s+(?:\\d{1,3})\\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)`,
 				"s",
 			);
-			const match = bodyText.match(pattern);
+			const textMatch = bodyText.match(versePattern);
 
-			if (match && match[1]) {
-				verseText = match[1].trim();
-
-				// Nettoyer les annotations
-				verseText = verseText.replace(/\([a-z]+\)/g, "");
+			if (textMatch && textMatch[1]) {
+				verseText = textMatch[1].trim();
 			}
 		}
 
@@ -1692,10 +1814,10 @@ class BibleConverter {
 		const processedVerseSet = this.processedVerses.get(chapterKey);
 		if (processedVerseSet.size === 0) return;
 
-		// Déterminer le nombre maximum de versets attendus
-		const maxVerse = Math.max(...Array.from(processedVerseSet)) + 3; // Ajout d'une marge
+		// Utiliser simplement le nombre maximum de versets trouvés
+		const maxVerse = Math.max(...Array.from(processedVerseSet));
 
-		// Vérifier quels versets sont manquants dans la plage 1 à maxVerse
+		// Vérifier les versets manquants dans la plage de 1 à maxVerse
 		const missingVerses = [];
 		for (let i = 1; i <= maxVerse; i++) {
 			if (!processedVerseSet.has(i)) {
@@ -1773,6 +1895,7 @@ class BibleConverter {
 			const fullText = $("body").text();
 
 			for (const verseNum of missingVerses) {
+				// Recherche de secours dans le texte complet
 				const versePattern = new RegExp(
 					`\\b${verseNum}\\s+([A-ZÉÈÊÀÂÇÙÛÔÏ][^\\n]*?)(?=\\s+(?:\\d{1,3})\\s+[A-ZÉÈÊÀÂÇÙÛÔÏ]|$)`,
 					"is",
