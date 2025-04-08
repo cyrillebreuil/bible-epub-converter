@@ -1,3 +1,5 @@
 node_modules/
 bible_liturgique.epub
 extracted_epub/
+logs/
+seedAELF.sql
