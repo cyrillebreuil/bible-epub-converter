@@ -83,6 +83,17 @@ const bookCodeMappings = {
 	Ap: "REV", // Apocalypse
 };
 
+// Gestion spéciale de la numérotation des psaumes entre AELF et la standard
+const psalmNumberMappings = {
+	// Psaumes qui sont divisés ou fusionnés dans la traduction AELF
+	"9A": 9,
+	"9B": 10,
+	"113A": 114,
+	"113B": 115,
+	"114-115": 116, // Si présent comme ça
+	"146-147": 147, // Si présent comme ça
+};
+
 // Configuration
 const config = {
 	baseUrl: "https://www.aelf.org/bible",
@@ -96,7 +107,7 @@ const config = {
 	outputFile: "seedAELF.sql",
 	requestDelay: 100, // 1 seconde entre les requêtes
 	debugMode: false, // Mettre à true pour tester seulement quelques livres
-	debugBooks: ["GEN", "MAT", "LUK"], // Livres à traiter en mode debug (PSA retiré)
+	debugBooks: ["GEN", "MAT", "PSA", "LUK"], // Livres à traiter en mode debug (PSA ajouté)
 	maxRetries: 3,
 	cacheDir: "./cache",
 	logDir: "./logs",
@@ -170,11 +181,7 @@ class BibleExtractor {
 			tabPanes.each((i, tabPane) => {
 				const tabId = $(tabPane).attr("id");
 				const isNewTestament = tabId === "nouveau";
-
-				// Ignorer l'onglet des psaumes
-				if (tabId === "psaumes") {
-					return;
-				}
+				const isPsalms = tabId === "psaumes";
 
 				// Récupérer tous les liens de livres dans cet onglet
 				$(tabPane)
@@ -191,14 +198,29 @@ class BibleExtractor {
 								const name = $(link).text().trim();
 
 								// Convertir en code standard
-								const standardCode = bookCodeMappings[aelfCode];
+								let standardCode = bookCodeMappings[aelfCode];
 
-								// Ignorer les psaumes
-								if (
-									aelfCode === "Ps" ||
-									standardCode === "PSA"
-								) {
-									return;
+								// Traitement spécial pour l'onglet des psaumes
+								if (isPsalms) {
+									standardCode = "PSA"; // Tous les psaumes utilisent le même code
+
+									// Extraire le numéro du psaume
+									const psalmNum = parts[3]; // Le numéro est dans l'URL
+
+									// Ajouter directement le psaume à traiter
+									this.booksToProcess.set(`Ps_${psalmNum}`, {
+										standardCode,
+										name: `Psaume ${psalmNum}`,
+										chaptersCount: 1, // Les psaumes ont toujours un seul chapitre
+										isNewTestament: false,
+										isPsalm: true,
+										psalmNumber: psalmNum,
+									});
+
+									this.log(
+										`Psaume identifié: ${name} (${psalmNum})`,
+									);
+									return; // Continuer avec le prochain lien
 								}
 
 								if (standardCode) {
@@ -246,6 +268,9 @@ class BibleExtractor {
 
 		// Pour chaque livre identifié
 		for (const [aelfCode, bookInfo] of this.booksToProcess.entries()) {
+			// Ignorer les psaumes car ils ont déjà leur chaptersCount défini
+			if (bookInfo.isPsalm) continue;
+
 			try {
 				this.log(`Analyse de ${bookInfo.name} (${aelfCode})...`);
 
@@ -310,16 +335,21 @@ class BibleExtractor {
 
 	// Traite un livre spécifique
 	async processBook(aelfCode, bookInfo) {
-		const { standardCode, name, chaptersCount } = bookInfo;
+		const { standardCode, name, chaptersCount, isPsalm, psalmNumber } =
+			bookInfo;
 
-		if (this.processedBooks.has(standardCode)) {
+		if (
+			this.processedBooks.has(
+				standardCode + (psalmNumber ? `_${psalmNumber}` : ""),
+			)
+		) {
 			this.log(`Livre ${name} (${standardCode}) déjà traité, ignoré.`);
 			return;
 		}
 
-		// Ignorer le livre des Psaumes
-		if (standardCode === "PSA") {
-			this.log(`Livre des Psaumes ignoré (sera traité manuellement).`);
+		// Si c'est un psaume, traitement spécial
+		if (isPsalm) {
+			await this.processPsalm(psalmNumber, standardCode, name);
 			return;
 		}
 
@@ -350,6 +380,73 @@ class BibleExtractor {
 		// Marquer ce livre comme traité
 		this.processedBooks.add(standardCode);
 		this.log(`Livre ${name} (${standardCode}) traité avec succès.`);
+	}
+
+	// Traite un psaume spécifique
+	async processPsalm(psalmNumber, standardCode, name) {
+		this.log(`Traitement du psaume ${psalmNumber}`);
+
+		// Normaliser le numéro de chapitre pour notre base de données
+		// En cas de psaumes spéciaux (9A, 9B, etc.), convertir selon le mapping
+		let normalizedPsalmNumber = psalmNumber;
+		if (psalmNumberMappings[psalmNumber]) {
+			normalizedPsalmNumber = psalmNumberMappings[psalmNumber];
+			this.log(
+				`Conversion: Psaume ${psalmNumber} -> ${normalizedPsalmNumber} (convention standard)`,
+			);
+		} else {
+			// Si c'est un nombre simple, le convertir en nombre
+			const numericPsalm = parseInt(psalmNumber, 10);
+			if (!isNaN(numericPsalm)) {
+				normalizedPsalmNumber = numericPsalm;
+			}
+		}
+
+		// Construire l'URL du psaume
+		const psalmUrl = `${this.config.baseUrl}/Ps/${psalmNumber}`;
+
+		// Vérifier si nous avons déjà une version en cache
+		const cacheFilePath = path.join(
+			this.config.cacheDir,
+			`Ps_${psalmNumber}.html`,
+		);
+
+		try {
+			let htmlContent;
+			if (fs.existsSync(cacheFilePath)) {
+				// Utiliser la version du cache
+				this.log(`Utilisation du cache pour Psaume ${psalmNumber}`);
+				htmlContent = fs.readFileSync(cacheFilePath, "utf8");
+			} else {
+				// Récupérer la page et la mettre en cache
+				const response = await this.fetchWithRetry(psalmUrl);
+				htmlContent = response.data;
+				fs.writeFileSync(cacheFilePath, htmlContent);
+			}
+
+			// Parser le HTML
+			const $ = cheerio.load(htmlContent);
+
+			// Titre officiel du psaume pour la traduction
+			const psalmTitle =
+				$("h1.m-b-10").first().text().trim() || `Psaume ${psalmNumber}`;
+			this.log(`Titre du psaume: ${psalmTitle}`);
+
+			// Extraire les versets
+			this.extractPsalmVerses(
+				$,
+				standardCode,
+				normalizedPsalmNumber,
+				psalmNumber,
+			);
+
+			// Marquer ce psaume comme traité
+			this.processedBooks.add(`${standardCode}_${psalmNumber}`);
+		} catch (error) {
+			this.log(
+				`Erreur lors du traitement du Psaume ${psalmNumber}: ${error.message}`,
+			);
+		}
 	}
 
 	// Traite un chapitre spécifique
@@ -488,6 +585,100 @@ class BibleExtractor {
 		return verseCount;
 	}
 
+	// Extrait les versets d'un psaume
+	extractPsalmVerses($, standardCode, chapterNum, originalPsalmNumber) {
+		let verseCount = 0;
+
+		// Les psaumes ont une structure différente
+		const verseElements = $(".verse");
+
+		// Définir le numéro du chapitre standardisé
+		const normalizedChapterNum = chapterNum;
+
+		// Ajouter l'entrée de chapitre
+		this.sqlStatements.push(`
+          INSERT INTO "chapters" ("bookID", "number") VALUES
+          ('${standardCode}', ${normalizedChapterNum})
+          ON CONFLICT ("bookID", "number") DO NOTHING;
+        `);
+
+		// Recherche du titre du psaume pour l'ajouter comme "verset 0" ou métadonnée
+		const psalmTitle = $("h1.m-b-10").first().text().trim();
+		const psalmSubtitle = $(".verse_reference").first().text().trim();
+
+		if (psalmTitle) {
+			// Ajouter le titre comme verset d'information (numéro 0)
+			const title = `${psalmTitle}${psalmSubtitle ? ` - ${psalmSubtitle}` : ""}`;
+			const escapedTitle = title.replace(/'/g, "''");
+
+			this.sqlStatements.push(`
+              INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+              ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+              (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+              0,
+              '${escapedTitle}')
+              ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+            `);
+		}
+
+		// Parcourir les versets
+		verseElements.each((i, element) => {
+			// La structure des psaumes peut varier, vérifions plusieurs façons d'obtenir le numéro
+			let verseNum;
+
+			// Rechercher un élément avec une classe qui contient le numéro de verset
+			const verseNumElem = $(element)
+				.find(".verse_number, .text-danger")
+				.first();
+
+			if (verseNumElem.length) {
+				verseNum = parseInt(verseNumElem.text().trim(), 10);
+
+				// Si on a trouvé un numéro de verset valide
+				if (!isNaN(verseNum)) {
+					// Cloner l'élément pour manipulation
+					const $verseContent = $(element).clone();
+
+					// Supprimer l'élément du numéro de verset et les autres éléments non textuels
+					$verseContent
+						.find(".verse_number, .text-danger, .verse_reference")
+						.remove();
+
+					// Récupérer le texte du verset
+					let verseText = $verseContent.text().trim();
+
+					// Nettoyer le texte
+					verseText = this.cleanVerseText(verseText);
+
+					if (verseText) {
+						const escapedText = verseText.replace(/'/g, "''");
+
+						this.log(
+							`      Psaume ${originalPsalmNumber} (normalisé: ${normalizedChapterNum}), verset ${verseNum}: ${verseText.substring(0, 30)}...`,
+						);
+
+						// Ajouter la requête SQL pour ce verset
+						this.sqlStatements.push(`
+                          INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+                          ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+                          (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+                          ${verseNum},
+                          '${escapedText}')
+                          ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+                        `);
+
+						verseCount++;
+					}
+				}
+			}
+		});
+
+		this.log(
+			`    Extrait ${verseCount} versets du Psaume ${originalPsalmNumber}`,
+		);
+		return verseCount;
+	}
+
 	// Nettoie le texte d'un verset
 	cleanVerseText(text) {
 		// Supprimer les espaces multiples
@@ -557,7 +748,7 @@ class BibleExtractor {
 
 			// Traiter chaque livre
 			for (const [aelfCode, bookInfo] of this.booksToProcess.entries()) {
-				if (bookInfo.chaptersCount > 0) {
+				if (bookInfo.chaptersCount > 0 || bookInfo.isPsalm) {
 					await this.processBook(aelfCode, bookInfo);
 				}
 			}
