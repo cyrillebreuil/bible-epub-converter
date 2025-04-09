@@ -84,14 +84,22 @@ const bookCodeMappings = {
 };
 
 // Gestion spéciale de la numérotation des psaumes entre AELF et la standard
+// Mappage basé sur les informations fournies
 const psalmNumberMappings = {
-	// Psaumes qui sont divisés ou fusionnés dans la traduction AELF
-	"9A": 9,
-	"9B": 10,
-	"113A": 114,
-	"113B": 115,
-	"114-115": 116, // Si présent comme ça
-	"146-147": 147, // Si présent comme ça
+	// Psaumes divisés en AELF
+	"9A": 9, // 9A correspond au psaume 9 standard
+	"9B": 10, // 9B correspond au psaume 10 standard
+	"113A": 114, // 113A correspond au psaume 114 standard
+	"113B": 115, // 113B correspond au psaume 115 standard
+};
+
+// Information sur les psaumes qui nécessitent une fusion
+const psalmFusionInfo = {
+	// Format: psaume AELF: { normalizedNumber: numéro standardisé, isPartOfFusion: true/false, offset: nombre de versets à décaler }
+	114: { normalizedNumber: 116, isPartOfFusion: true, offset: 0 },
+	115: { normalizedNumber: 116, isPartOfFusion: true, offset: 9 }, // on sait qu'il y a 9 versets dans le psaume 114
+	146: { normalizedNumber: 147, isPartOfFusion: true, offset: 0 },
+	147: { normalizedNumber: 147, isPartOfFusion: true, offset: 11 }, // on sait qu'il y a 11 versets dans le psaume 146
 };
 
 // Configuration
@@ -105,9 +113,9 @@ const config = {
 		regionCode: "FR",
 	},
 	outputFile: "seedAELF.sql",
-	requestDelay: 100, // 1 seconde entre les requêtes
+	requestDelay: 100, // délai entre les requêtes
 	debugMode: false, // Mettre à true pour tester seulement quelques livres
-	debugBooks: ["GEN", "MAT", "PSA", "LUK"], // Livres à traiter en mode debug (PSA ajouté)
+	debugBooks: ["GEN", "MAT", "PSA", "LUK"], // Livres à traiter en mode debug
 	maxRetries: 3,
 	cacheDir: "./cache",
 	logDir: "./logs",
@@ -120,6 +128,7 @@ class BibleExtractor {
 		this.booksToProcess = new Map(); // Stocke les livres avec leur nombre de chapitres
 		this.processedBooks = new Set();
 		this.bookNames = new Map(); // Stocke les noms complets des livres
+		this.psalmChapters = new Map(); // Pour stocker les identifiants de chapitres des psaumes
 
 		// Créer les dossiers nécessaires
 		fs.ensureDirSync(this.config.cacheDir);
@@ -386,19 +395,35 @@ class BibleExtractor {
 	async processPsalm(psalmNumber, standardCode, name) {
 		this.log(`Traitement du psaume ${psalmNumber}`);
 
+		// Vérifier si c'est un psaume qui est une partie d'une fusion
+		const fusionInfo = psalmFusionInfo[psalmNumber];
+
 		// Normaliser le numéro de chapitre pour notre base de données
-		// En cas de psaumes spéciaux (9A, 9B, etc.), convertir selon le mapping
-		let normalizedPsalmNumber = psalmNumber;
-		if (psalmNumberMappings[psalmNumber]) {
+		let normalizedPsalmNumber;
+		let needsFusion = false;
+		let verseOffset = 0;
+
+		if (fusionInfo) {
+			// Ce psaume fait partie d'une fusion
+			normalizedPsalmNumber = fusionInfo.normalizedNumber;
+			needsFusion = fusionInfo.isPartOfFusion;
+			verseOffset = fusionInfo.offset;
+
+			this.log(
+				`Psaume ${psalmNumber} fait partie d'une fusion vers le psaume ${normalizedPsalmNumber} avec décalage ${verseOffset}`,
+			);
+		} else if (psalmNumberMappings[psalmNumber]) {
+			// Cas spéciaux: 9A, 9B, 113A, 113B, etc.
 			normalizedPsalmNumber = psalmNumberMappings[psalmNumber];
 			this.log(
 				`Conversion: Psaume ${psalmNumber} -> ${normalizedPsalmNumber} (convention standard)`,
 			);
 		} else {
-			// Si c'est un nombre simple, le convertir en nombre
-			const numericPsalm = parseInt(psalmNumber, 10);
-			if (!isNaN(numericPsalm)) {
-				normalizedPsalmNumber = numericPsalm;
+			// Psaume standard
+			normalizedPsalmNumber = parseInt(psalmNumber, 10);
+			if (isNaN(normalizedPsalmNumber)) {
+				this.log(`Numéro de psaume invalide: ${psalmNumber}`);
+				return;
 			}
 		}
 
@@ -432,12 +457,14 @@ class BibleExtractor {
 				$("h1.m-b-10").first().text().trim() || `Psaume ${psalmNumber}`;
 			this.log(`Titre du psaume: ${psalmTitle}`);
 
-			// Extraire les versets
+			// Extraire les versets avec gestion de fusion
 			this.extractPsalmVerses(
 				$,
 				standardCode,
 				normalizedPsalmNumber,
 				psalmNumber,
+				needsFusion,
+				verseOffset,
 			);
 
 			// Marquer ce psaume comme traité
@@ -585,55 +612,63 @@ class BibleExtractor {
 		return verseCount;
 	}
 
-	// Extrait les versets d'un psaume
-	extractPsalmVerses($, standardCode, chapterNum, originalPsalmNumber) {
+	// Extrait les versets d'un psaume avec gestion de fusion
+	extractPsalmVerses(
+		$,
+		standardCode,
+		normalizedChapterNum,
+		originalPsalmNumber,
+		isFusionPart = false,
+		verseOffset = 0,
+	) {
 		let verseCount = 0;
 
 		// Les psaumes ont une structure différente
 		const verseElements = $("p");
 
-		// Définir le numéro du chapitre standardisé
-		const normalizedChapterNum = chapterNum;
-
-		// Ajouter l'entrée de chapitre
-		this.sqlStatements.push(`
-        INSERT INTO "chapters" ("bookID", "number") VALUES
-        ('${standardCode}', ${normalizedChapterNum})
-        ON CONFLICT ("bookID", "number") DO NOTHING;
-    `);
-
-		// Recherche du titre du psaume pour l'ajouter comme "verset 0" ou métadonnée
-		const psalmTitle = $("h1.m-b-10").first().text().trim();
-		const psalmSubtitle = $(".verse_reference").first().text().trim();
-
-		if (psalmTitle) {
-			// Ajouter le titre comme verset d'information (numéro 0)
-			const title = `${psalmTitle}${psalmSubtitle ? ` - ${psalmSubtitle}` : ""}`;
-			const escapedTitle = title.replace(/'/g, "''");
-
+		// Si ce n'est pas une partie de fusion, créer l'entrée de chapitre
+		if (!isFusionPart || verseOffset === 0) {
 			this.sqlStatements.push(`
-            INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-            ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
-            (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
-            0,
-            '${escapedTitle}')
-            ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-        `);
+				INSERT INTO "chapters" ("bookID", "number") VALUES
+				('${standardCode}', ${normalizedChapterNum})
+				ON CONFLICT ("bookID", "number") DO NOTHING;
+			`);
+
+			// Recherche du titre du psaume pour l'ajouter comme "verset 0" ou métadonnée
+			const psalmTitle = $("h1.m-b-10").first().text().trim();
+			const psalmSubtitle = $(".verse_reference").first().text().trim();
+
+			if (psalmTitle) {
+				// Ajouter le titre comme verset d'information (numéro 0)
+				const title = `${psalmTitle}${psalmSubtitle ? ` - ${psalmSubtitle}` : ""}`;
+				const escapedTitle = title.replace(/'/g, "''");
+
+				this.sqlStatements.push(`
+					INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+					((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+					(SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+					0,
+					'${escapedTitle}')
+					ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+				`);
+			}
 		}
 
 		// Parcourir les versets
 		verseElements.each((i, element) => {
-			// La structure des psaumes peut varier, vérifions plusieurs façons d'obtenir le numéro
-			let verseNum;
-
 			// Rechercher un élément avec une classe qui contient le numéro de verset
 			const verseNumElem = $(element).find(".text-danger").first();
 
 			if (verseNumElem.length) {
-				verseNum = parseInt(verseNumElem.text().trim(), 10);
+				let verseNum = parseInt(verseNumElem.text().trim(), 10);
 
 				// Si on a trouvé un numéro de verset valide
 				if (!isNaN(verseNum)) {
+					// Si c'est une partie de fusion, appliquer le décalage de versets
+					if (isFusionPart) {
+						verseNum = verseNum + verseOffset;
+					}
+
 					// Cloner l'élément pour manipulation
 					const $verseContent = $(element).clone();
 
@@ -657,13 +692,13 @@ class BibleExtractor {
 
 						// Ajouter la requête SQL pour ce verset
 						this.sqlStatements.push(`
-                        INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-                        ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
-                        (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
-                        ${verseNum},
-                        '${escapedText}')
-                        ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-                    `);
+							INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+							((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+							(SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+							${verseNum},
+							'${escapedText}')
+							ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+						`);
 
 						verseCount++;
 					}
@@ -672,7 +707,7 @@ class BibleExtractor {
 		});
 
 		this.log(
-			`    Extrait ${verseCount} versets du Psaume ${originalPsalmNumber}`,
+			`    Extrait ${verseCount} versets du Psaume ${originalPsalmNumber}${isFusionPart ? " (partie fusionnée)" : ""}`,
 		);
 		return verseCount;
 	}
