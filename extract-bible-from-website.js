@@ -590,17 +590,17 @@ class BibleExtractor {
 		let verseCount = 0;
 
 		// Les psaumes ont une structure différente
-		const verseElements = $(".verse");
+		const verseElements = $("p");
 
 		// Définir le numéro du chapitre standardisé
 		const normalizedChapterNum = chapterNum;
 
 		// Ajouter l'entrée de chapitre
 		this.sqlStatements.push(`
-          INSERT INTO "chapters" ("bookID", "number") VALUES
-          ('${standardCode}', ${normalizedChapterNum})
-          ON CONFLICT ("bookID", "number") DO NOTHING;
-        `);
+        INSERT INTO "chapters" ("bookID", "number") VALUES
+        ('${standardCode}', ${normalizedChapterNum})
+        ON CONFLICT ("bookID", "number") DO NOTHING;
+    `);
 
 		// Recherche du titre du psaume pour l'ajouter comme "verset 0" ou métadonnée
 		const psalmTitle = $("h1.m-b-10").first().text().trim();
@@ -612,13 +612,13 @@ class BibleExtractor {
 			const escapedTitle = title.replace(/'/g, "''");
 
 			this.sqlStatements.push(`
-              INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-              ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
-              (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
-              0,
-              '${escapedTitle}')
-              ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-            `);
+            INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+            ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+            (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+            0,
+            '${escapedTitle}')
+            ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+        `);
 		}
 
 		// Parcourir les versets
@@ -627,9 +627,7 @@ class BibleExtractor {
 			let verseNum;
 
 			// Rechercher un élément avec une classe qui contient le numéro de verset
-			const verseNumElem = $(element)
-				.find(".verse_number, .text-danger")
-				.first();
+			const verseNumElem = $(element).find(".text-danger").first();
 
 			if (verseNumElem.length) {
 				verseNum = parseInt(verseNumElem.text().trim(), 10);
@@ -641,7 +639,7 @@ class BibleExtractor {
 
 					// Supprimer l'élément du numéro de verset et les autres éléments non textuels
 					$verseContent
-						.find(".verse_number, .text-danger, .verse_reference")
+						.find(".text-danger, .verse_reference")
 						.remove();
 
 					// Récupérer le texte du verset
@@ -659,13 +657,13 @@ class BibleExtractor {
 
 						// Ajouter la requête SQL pour ce verset
 						this.sqlStatements.push(`
-                          INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
-                          ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
-                          (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
-                          ${verseNum},
-                          '${escapedText}')
-                          ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
-                        `);
+                        INSERT INTO "verses" ("chapterID", "translationID", "number", "text") VALUES
+                        ((SELECT "id" FROM "chapters" WHERE "bookID" = '${standardCode}' AND "number" = ${normalizedChapterNum}),
+                        (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'),
+                        ${verseNum},
+                        '${escapedText}')
+                        ON CONFLICT ("chapterID", "translationID", "number") DO NOTHING;
+                    `);
 
 						verseCount++;
 					}
