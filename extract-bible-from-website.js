@@ -425,6 +425,23 @@ class BibleExtractor {
 				this.log(`Numéro de psaume invalide: ${psalmNumber}`);
 				return;
 			}
+			// Appliquer les règles de décalage
+			if (numPsalm >= 10 && numPsalm <= 112) {
+				// Décalage de +1 pour les psaumes 10 à 112
+				normalizedPsalmNumber = numPsalm + 1;
+				this.log(
+					`Décalage appliqué: Psaume ${psalmNumber} -> ${normalizedPsalmNumber}`,
+				);
+			} else if (numPsalm >= 116 && numPsalm <= 145) {
+				// Décalage de +1 pour les psaumes 116 à 145
+				normalizedPsalmNumber = numPsalm + 1;
+				this.log(
+					`Décalage appliqué: Psaume ${psalmNumber} -> ${normalizedPsalmNumber}`,
+				);
+			} else {
+				// Psaumes sans décalage (1-8, 148-150)
+				normalizedPsalmNumber = numPsalm;
+			}
 		}
 
 		// Construire l'URL du psaume
