@@ -419,9 +419,9 @@ class BibleExtractor {
 				`Conversion: Psaume ${psalmNumber} -> ${normalizedPsalmNumber} (convention standard)`,
 			);
 		} else {
-			// Psaume standard
-			normalizedPsalmNumber = parseInt(psalmNumber, 10);
-			if (isNaN(normalizedPsalmNumber)) {
+			// Psaume standard - appliquer les règles de décalage
+			const numPsalm = parseInt(psalmNumber, 10);
+			if (isNaN(numPsalm)) {
 				this.log(`Numéro de psaume invalide: ${psalmNumber}`);
 				return;
 			}
