@@ -129,6 +129,7 @@ class BibleExtractor {
 		this.processedBooks = new Set();
 		this.bookNames = new Map(); // Stocke les noms complets des livres
 		this.psalmChapters = new Map(); // Pour stocker les identifiants de chapitres des psaumes
+		this.psalmBookAdded = false; // Nouvelle propriété pour suivre si le livre des Psaumes a été ajouté
 
 		// Créer les dossiers nécessaires
 		fs.ensureDirSync(this.config.cacheDir);
@@ -394,6 +395,17 @@ class BibleExtractor {
 	// Traite un psaume spécifique
 	async processPsalm(psalmNumber, standardCode, name) {
 		this.log(`Traitement du psaume ${psalmNumber}`);
+
+		// Ajouter l'entrée pour le livre des Psaumes s'il n'a pas déjà été ajouté
+		if (!this.psalmBookAdded) {
+			this.sqlStatements.push(`
+            INSERT INTO "bookTranslations" ("bookID", "translationID", "name") VALUES
+            ('PSA', (SELECT "id" FROM "translations" WHERE "code" = '${this.config.translationInfo.code}'), 'Livre des Psaumes')
+            ON CONFLICT ("bookID", "translationID") DO NOTHING;
+        `);
+			this.psalmBookAdded = true;
+			this.log(`Ajout de la traduction pour le Livre des Psaumes`);
+		}
 
 		// Vérifier si c'est un psaume qui est une partie d'une fusion
 		const fusionInfo = psalmFusionInfo[psalmNumber];
