@@ -94,8 +94,8 @@ const config = {
 		regionCode: "FR",
 	},
 	outputFile: "seedAELF.sql",
-	requestDelay: 1000, // 1 seconde entre les requêtes
-	debugMode: true, // Mettre à true pour tester seulement quelques livres
+	requestDelay: 100, // 1 seconde entre les requêtes
+	debugMode: false, // Mettre à true pour tester seulement quelques livres
 	debugBooks: ["GEN", "MAT", "LUK"], // Livres à traiter en mode debug (PSA retiré)
 	maxRetries: 3,
 	cacheDir: "./cache",
